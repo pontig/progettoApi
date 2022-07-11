@@ -2,6 +2,7 @@
     "files.associations": {
         "typeinfo": "c",
         "header.h": "c",
-        "trees.h": "c"
+        "trees.h": "c",
+        "stdlib.h": "c"
     }
 }

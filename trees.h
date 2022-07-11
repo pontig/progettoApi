@@ -36,6 +36,28 @@ void inorder_tree_walk(tree root) {
     }
     inorder_tree_walk(root->left);
     printf("%d ", root->key);
+    // printf("\n");
+    // if (root->parent != NULL) {
+    //     printf("His father is %d\n", root->parent->key);
+    // } else {
+    //     printf("His father is NULL\n");
+    // }
+    // if (root->left != NULL) {
+    //     printf("His left child is %d\n", root->left->key);
+    // } else {
+    //     printf("His left child is NULL\n");
+    // }
+    // if (root->right != NULL) {
+    //     printf("His right child is %d\n", root->right->key);
+    // } else {
+    //     printf("His right child is NULL\n");
+    // }
+    // if (root->color == RED) {
+    //     printf("He is Red\n");
+    // } else {
+    //     printf("He is Black\n");
+    // }
+    // printf("\n");
     inorder_tree_walk(root->right);
 }
 
@@ -238,7 +260,7 @@ void rb_insert(tree *root, int key, tree_info *info) {
     new_node->right = NULL;
     new_node->parent = parent;
     new_node->color = RED;
-    if (parent == NULL) {
+    if (*root == NULL) {
         *root = new_node;
     } else if (key < parent->key) {
         parent->left = new_node;
