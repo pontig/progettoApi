@@ -3,4 +3,6 @@ aeiou
 qwert
 cvfse
 voajd
-+
++nuova_partita
+aeiou
+5
