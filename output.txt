@@ -1,2 +1,75 @@
-aeiou
-5
+iteration
+bdhej color 1
+
+iteration
+bdhej color 1
+epsld color 0(father bdhej)(right)
+
+iteration
+bdhej color 0(father dpelr)(left)
+dpelr color 1
+epsld color 0(father dpelr)(right)
+
+iteration
+bdhej color 1(father dpelr)(left)
+dpelr color 1
+epsld color 1(father dpelr)(right)
+hpaos color 0(father epsld)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+dpelr color 1
+epsld color 1(father dpelr)(right)
+hpaos color 0(father epsld)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+dpelr color 1
+epsld color 0(father foaps)(left)
+foaps color 1(father dpelr)(right)
+hpaos color 0(father foaps)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+dpelr color 1
+epsld color 1(father foaps)(left)
+foaps color 0(father dpelr)(right)
+hpaos color 1(father foaps)(right)
+ipaos color 0(father hpaos)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+casid color 0(father bdhej)(right)
+dpelr color 1
+epsld color 1(father foaps)(left)
+foaps color 0(father dpelr)(right)
+hpaos color 1(father foaps)(right)
+ipaos color 0(father hpaos)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+casid color 0(father bdhej)(right)
+dpelr color 1
+epsld color 1(father foaps)(left)
+foaps color 0(father dpelr)(right)
+gpaos color 0(father hpaos)(left)
+hpaos color 1(father foaps)(right)
+ipaos color 0(father hpaos)(right)
+
+iteration
+amedo color 0(father bdhej)(left)
+bdhej color 1(father dpelr)(left)
+casid color 0(father bdhej)(right)
+dpelr color 0(father foaps)(left)
+epsld color 1(father dpelr)(right)
+foaps color 1
+gpaos color 1(father hpaos)(left)
+hpaos color 0(father foaps)(right)
+ipaos color 1(father hpaos)(right)
+lodif color 0(father ipaos)(right)
+

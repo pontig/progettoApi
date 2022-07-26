@@ -28,8 +28,8 @@ typedef struct tree_node {
 typedef tree_node *tree;
 
 // Red-black tree rotations
-void left_rotate (tree *root, tree x) {
-    tree y = x->right;
+void left_rotate(tree *root, tree_node *x) {
+    tree_node *y = x->right;
     x->right = y->left;
     if (y->left != NULL) {
         y->left->parent = x;
@@ -44,35 +44,37 @@ void left_rotate (tree *root, tree x) {
     }
     y->left = x;
     x->parent = y;
+    return;
 }
 
-void right_rotate(tree *root, tree x) {
-    tree y = x->left;
-    x->left = y->right;
-    if (y->right != NULL) {
-        y->right->parent = x;
+void right_rotate(tree *root, tree_node *y) {
+    tree_node *x = y->left;
+    y->left = x->right;
+    if (x->right != NULL) {
+        x->right->parent = y;
     }
-    y->parent = x->parent;
-    if (x->parent == NULL) {
-        *root = y;
-    } else if (x == x->parent->right) {
-        x->parent->right = y;
+    x->parent = y->parent;
+    if (y->parent == NULL) {
+        *root = x;
+    } else if (y == y->parent->left) {
+        y->parent->left = x;
     } else {
-        x->parent->left = y;
+        y->parent->right = x;
     }
-    y->right = x;
-    x->parent = y;
+    x->right = y;
+    y->parent = x;
+    return;
 }
 
 // Red-black tree insert fixup
-void rb_insert_fixup(tree t, tree_node *z) {
+void rb_insert_fixup(tree *t, tree_node *z) {
     tree_node *x, *y;
     if (z->parent == NULL)
         z->color = BLACK;
     else {
         x = z->parent;
         if (x->color == RED) {
-            if (x = x->parent->left) {
+            if (x == x->parent->left) {
                 y = x->parent->right;
                 if (y != NULL && y->color == RED) {
                     x->color = BLACK;
@@ -83,6 +85,7 @@ void rb_insert_fixup(tree t, tree_node *z) {
                     if (z == x->right) {
                         z = x;
                         left_rotate(t, z);
+                        x = z->parent;
                     }
                     x->color = BLACK;
                     x->parent->color = RED;
@@ -99,6 +102,7 @@ void rb_insert_fixup(tree t, tree_node *z) {
                     if (z == x->left) {
                         z = x;
                         right_rotate(t, z);
+                        x = z->parent;
                     }
                     x->color = BLACK;
                     x->parent->color = RED;
@@ -110,12 +114,14 @@ void rb_insert_fixup(tree t, tree_node *z) {
 }
 
 // Red-black tree insert
-void rb_insert(tree t, char *key) {
-    tree y = NULL;
-    tree x = t;
-    tree z = (tree)malloc(sizeof(tree_node));
+void rb_insert(tree *t, char *key) {
+    tree_node *y = NULL;
+    tree_node *x = *t;
+    tree_node *z = (tree)malloc(sizeof(tree_node));
     z->key = key;
-    z->parent = NULL;
+    z->left = NULL;
+    z->right = NULL;
+    z->color = RED;
     while (x != NULL) {
         y = x;
         if (strcmp(z->key, x->key) < 0) {
@@ -126,16 +132,44 @@ void rb_insert(tree t, char *key) {
     }
     z->parent = y;
     if (y == NULL) {
-        t = z;
+        *t = z;
     } else if (strcmp(z->key, y->key) < 0) {
         y->left = z;
     } else {
         y->right = z;
     }
-    z->left = NULL;
-    z->right = NULL;
-    z->color = RED;
     rb_insert_fixup(t, z);
+}
+
+// Inorder tree walk
+void inorder(tree t) {
+    if (t != NULL) {
+        inorder(t->left);
+        printf("\n%s ", t->key);
+        printf("color %d", t->color);
+        if (t->parent != NULL) {
+            printf("(father %s)", t->parent->key);
+            if (t == t->parent->right)
+                printf("(right)");
+            else
+                printf("(left)");
+        }
+        inorder(t->right);
+    }
+}
+
+// Tree search
+tree_node *rb_search(tree t, char *key) {
+    while (t != NULL) {
+        if (strcmp(key, t->key) < 0) {
+            t = t->left;
+        } else if (strcmp(key, t->key) > 0) {
+            t = t->right;
+        } else {
+            return t;
+        }
+    }
+    return NULL;
 }
 
 int k;      // lenght of the words
@@ -148,6 +182,7 @@ int h(int x) {
     if (x >= 65 && x <= 90) return x - 54;
     if (x == 95) return 37;
     if (x >= 97 && x <= 122) return x - 59;
+    return -1;
 }
 
 // Ignore the entire line in stdin, using getline and freeing the memory
@@ -177,7 +212,13 @@ void play(int max, char *ref, char **elig) {
     int attempts = 0;  // Number of attempts done until now
     int flag = 1;      // If the word must be compared or not
 
-    Filter alphabet[64];  // Array of filters, one for each character
+    Filter alphabet[64];   // Array of filters, one for each character
+    tree remained = NULL;  // Tree of words that are not eliminated
+
+    // Put the words in the tree
+    for (int i = 0; i < e; i++) {
+        rb_insert(&remained, elig[i]);
+    }
 
     do {
         char c = getchar();
@@ -191,7 +232,7 @@ void play(int max, char *ref, char **elig) {
                 c = getchar();
                 if (c == 'i') {
                     ignoreLine();
-                    fillEligibles(ref);
+                    fillEligibles(&ref);
                     ignoreLine();
                 } else if (c == 's') {
                     // siamo nella cacca di stampa_filtrate
@@ -199,6 +240,7 @@ void play(int max, char *ref, char **elig) {
             } else {
                 // It is a word
                 char *output = (char *)malloc(sizeof(char) * k);
+
             }
         }
     } while (flag);
@@ -232,6 +274,5 @@ int main(int argc, char const *argv[]) {
         }
         flag = EOF;
     }
-
     return 0;
 }
