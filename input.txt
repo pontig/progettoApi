@@ -9,4 +9,4 @@ ipaos
 casid
 gpaos
 lodif
-+
++nuova_partita

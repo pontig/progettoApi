@@ -30,6 +30,7 @@ typedef struct tree_node {
     struct tree_node *right;
     struct tree_node *parent;
     char *key;
+    int used;
     rb_color color;
 } tree_node;
 
@@ -74,7 +75,7 @@ void right_rotate(tree *root, tree_node *y) {
     return;
 }
 
-// Red-black tree insert fixup
+// Red-black tree insert
 void rb_insert_fixup(tree *t, tree_node *z) {
     tree_node *x, *y;
     if (z->parent == NULL)
@@ -120,13 +121,12 @@ void rb_insert_fixup(tree *t, tree_node *z) {
         }
     }
 }
-
-// Red-black tree insert
 void rb_insert(tree *t, char *key) {
     tree_node *y = NULL;
     tree_node *x = *t;
     tree_node *z = (tree)malloc(sizeof(tree_node));
     z->key = key;
+    z->used = 1;
     z->left = NULL;
     z->right = NULL;
     z->color = RED;
@@ -154,14 +154,15 @@ void inorder(tree t) {
     if (t != NULL) {
         inorder(t->left);
         printf("\n%s ", t->key);
-        printf("color %d", t->color);
-        if (t->parent != NULL) {
-            printf("(father %s)", t->parent->key);
-            if (t == t->parent->right)
-                printf("(right)");
-            else
-                printf("(left)");
-        }
+        printf("Used: %d", t->used);
+        // printf("color %d", t->color);
+        // if (t->parent != NULL) {
+        //     printf("(father %s)", t->parent->key);
+        //     if (t == t->parent->right)
+        //         printf("(right)");
+        //     else
+        //         printf("(left)");
+        // }
         inorder(t->right);
     }
 }
@@ -180,10 +181,19 @@ tree_node *rb_search(tree t, char *key) {
     return NULL;
 }
 
+// Reset all used flags to 0
+void reset_used(tree t) {
+    if (t != NULL) {
+        reset_used(t->left);
+        t->used = 0;
+        reset_used(t->right);
+    }
+}
+
 int k;      // lenght of the words
 int e = 0;  // Number of eligibles words
 
-// Heap sord an array of Word type
+// Heap sort an array of Word type
 void swap(Word *a, int pos1, int pos2) {
     Word aux = a[pos1];
     a[pos1] = a[pos2];
@@ -238,15 +248,15 @@ void ignoreLine() {
     free(line);
 }
 
-void fillEligibles(char **arr) {
-    // TODO: se le parole sono aggiunte da un +inserisci_inizio, vanno anche nell'albero
+void fillEligibles(tree *t) {
     do {
+        char *i = (char *)malloc(sizeof(char) * k);
         char c = getchar();
         ungetc(c, stdin);
         if (c != '+') {
-            arr[e] = (char *)malloc(sizeof(char) * k);
-            fgets(arr[e], k + 1, stdin);
+            fgets(i, k + 1, stdin);
             getchar();
+            rb_insert(t, i);
             e++;
         } else {
             return;
@@ -254,12 +264,11 @@ void fillEligibles(char **arr) {
     } while (1);
 }
 
-void play(int max, char *ref, char **elig) {
+void play(int max, char *ref, tree *elig) {
     int attempts = 0;  // Number of attempts done until now
     int flag = 1;      // If the word must be compared or not
 
-    Filter alphabet[64];   // Array of filters, one for each character
-    tree remained = NULL;  // Tree of words that are not eliminated
+    Filter alphabet[64];  // Array of filters, one for each character
 
     // Set every minappears to 0
     for (int i = 0; i < 64; i++) {
@@ -268,42 +277,45 @@ void play(int max, char *ref, char **elig) {
         alphabet[i].iforb = 0;
     }
 
-    // Put the words in the tree
-    for (int i = 0; i < e; i++) {
-        rb_insert(&remained, elig[i]);
-    }
-
     do {
-        Word *orderRefMod = (Word *)malloc(sizeof(Word) * k);
-        char *orderRef = (char *)malloc(sizeof(char) * k);
-        for (int i = 0; i < k; i++) {
-            orderRefMod[i].w = ref[i];
-        }
-        int hw = 0;  // Head word
-        int hr = 0;  // Head reference
-        heap_sort(orderRefMod, k);
-        for (int i = 0; i < k; i++) {
-            orderRef[i] = orderRefMod[i].w;
-        }
-        free(orderRefMod);
+        // Begin the comparisons
         char c = getchar();
         ungetc(c, stdin);
-        if (c == EOF)
+        if (c == EOF || attempts >= max) {
             flag = 0;
-        else {
+            if (attempts >= max) {
+                printf("ko\n");
+            }
+            return;
+        } else {
             if (c == '+') {
                 // inserisci_inizio || stampa_filtrate
                 getchar();
                 c = getchar();
                 if (c == 'i') {
+                    // inserisci_inizio
                     ignoreLine();
-                    fillEligibles(&ref);
+                    fillEligibles(elig);
                     ignoreLine();
                 } else if (c == 's') {
-                    // siamo nella cacca di stampa_filtrate
+                    // stampa_filtrate
                 }
             } else {
                 // It is a word
+                Word *orderRefMod = (Word *)malloc(sizeof(Word) * k);  // Temporary array of reference word
+                char *orderRef = (char *)malloc(sizeof(char) * k);     // The reference word in the order of the alphabet
+                int hw = 0;                                            // Head word
+                int hr = 0;                                            // Head reference
+
+                // Fill the temporary array of reference word, put it in the order of the alphabet and put it in the orderRef array
+                for (int i = 0; i < k; i++) {
+                    orderRefMod[i].w = ref[i];
+                }
+                heap_sort(orderRefMod, k);
+                for (int i = 0; i < k; i++) {
+                    orderRef[i] = orderRefMod[i].w;
+                }
+                free(orderRefMod);
                 char *output = (char *)malloc(sizeof(char) * k);   // String of comparison
                 Word *ordWord = (Word *)malloc(sizeof(Word) * k);  // Word to be compared ordered
                 char *unWord = (char *)malloc(sizeof(char) * k);   // Word to be compared unordered
@@ -314,11 +326,11 @@ void play(int max, char *ref, char **elig) {
                     ordWord[i].pos = i;
                 }
                 getchar();
-                tree_node *node = rb_search(remained, unWord);
+                tree_node *node = rb_search(*elig, unWord);
                 if (node == NULL) {
                     printf("not_exists");
                 } else {
-                    // TODO : remove the word from the tree
+                    node->used = 1;
                     attempts++;
                     heap_sort(ordWord, k);
                     do {
@@ -359,7 +371,11 @@ void play(int max, char *ref, char **elig) {
                             }
                         }
                     } while (hw < k && hr < k);
-                    printf("%s\n", output);
+                    if (counter == k) {
+                        printf("ok\n");
+                    } else {
+                        printf("%s", output);
+                    }
                 }
             }
         }
@@ -367,12 +383,12 @@ void play(int max, char *ref, char **elig) {
 }
 
 int main(int argc, char const *argv[]) {
-    char **eligibiles = (char **)malloc(sizeof(char *));  // Dinamic array of elegibles words
+    tree eligibiles = NULL;
     scanf("%d\n", &k);
     char *ref = (char *)malloc(sizeof(char) * k);  // Reference word
     int max;                                       // Maximum number of attempts allowed
 
-    fillEligibles(eligibiles);
+    fillEligibles(&eligibiles);
 
     char flag = getchar();
     while (flag != EOF) {
@@ -383,16 +399,17 @@ int main(int argc, char const *argv[]) {
             case 'n':  // nuova_partita
                 fgets(ref, k + 1, stdin);
                 scanf("%d\n", &max);
-                play(max, ref, eligibiles);
+                reset_used(eligibiles);
+                play(max, ref, &eligibiles);
                 break;
             case 'i':  // inserisci_inizio
-                fillEligibles(eligibiles);
+                fillEligibles(&eligibiles);
                 ignoreLine();
                 break;
             default:
                 break;
         }
-        flag = EOF;
+        flag = getchar();
     }
     return 0;
 }
