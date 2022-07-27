@@ -3,11 +3,20 @@
 #include <string.h>
 
 typedef struct {
-    int memb;    // If the char is NOT a member of ref
-    int *cert;   // Positions where the character is
-    int *forb;   // Positions where the character must not be
-    int minApp;  // Minimum number of appearances
+    int memb;   // If the char is NOT a member of ref
+    int *cert;  // Positions where the character is
+    int icert;
+    int *forb;  // Positions where the character must not be
+    int iforb;
+    int minApp;    // Minimum number of appearances
+    int exactApp;  // Exact number of appearances
 } Filter;
+
+// Typedef to assign \, |
+typedef struct {
+    char w;
+    int pos;
+} Word;
 
 // Typedef enum red, black
 typedef enum {
@@ -46,7 +55,6 @@ void left_rotate(tree *root, tree_node *x) {
     x->parent = y;
     return;
 }
-
 void right_rotate(tree *root, tree_node *y) {
     tree_node *x = y->left;
     y->left = x->right;
@@ -175,6 +183,43 @@ tree_node *rb_search(tree t, char *key) {
 int k;      // lenght of the words
 int e = 0;  // Number of eligibles words
 
+// Heap sord an array of Word type
+void swap(Word *a, int pos1, int pos2) {
+    Word aux = a[pos1];
+    a[pos1] = a[pos2];
+    a[pos2] = aux;
+}
+void max_heapify(Word *a, int i) {
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+    int largest;
+    if (l < e && a[l].w > a[i].w) {
+        largest = l;
+    } else {
+        largest = i;
+    }
+    if (r < e && a[r].w > a[largest].w) {
+        largest = r;
+    }
+    if (largest != i) {
+        swap(a, i, largest);
+        max_heapify(a, largest);
+    }
+}
+void build_max_heap(Word *a, int n) {
+    int i;
+    for (i = n / 2; i >= 0; i--) {
+        max_heapify(a, n);
+    }
+}
+void heap_sort(Word *a, int n) {
+    build_max_heap(a, n);
+    for (int i = n - 1; i > 0; i--) {
+        swap(a, 0, i);
+        max_heapify(a, 0);
+    }
+}
+
 // Return the position of the filter characters
 int h(int x) {
     if (x == 45) return 0;
@@ -194,6 +239,7 @@ void ignoreLine() {
 }
 
 void fillEligibles(char **arr) {
+    // TODO: se le parole sono aggiunte da un +inserisci_inizio, vanno anche nell'albero
     do {
         char c = getchar();
         ungetc(c, stdin);
@@ -215,12 +261,31 @@ void play(int max, char *ref, char **elig) {
     Filter alphabet[64];   // Array of filters, one for each character
     tree remained = NULL;  // Tree of words that are not eliminated
 
+    // Set every minappears to 0
+    for (int i = 0; i < 64; i++) {
+        alphabet[i].minApp = 0;
+        alphabet[i].icert = 0;
+        alphabet[i].iforb = 0;
+    }
+
     // Put the words in the tree
     for (int i = 0; i < e; i++) {
         rb_insert(&remained, elig[i]);
     }
 
     do {
+        Word *orderRefMod = (Word *)malloc(sizeof(Word) * k);
+        char *orderRef = (char *)malloc(sizeof(char) * k);
+        for (int i = 0; i < k; i++) {
+            orderRefMod[i].w = ref[i];
+        }
+        int hw = 0;  // Head word
+        int hr = 0;  // Head reference
+        heap_sort(orderRefMod, k);
+        for (int i = 0; i < k; i++) {
+            orderRef[i] = orderRefMod[i].w;
+        }
+        free(orderRefMod);
         char c = getchar();
         ungetc(c, stdin);
         if (c == EOF)
@@ -239,8 +304,63 @@ void play(int max, char *ref, char **elig) {
                 }
             } else {
                 // It is a word
-                char *output = (char *)malloc(sizeof(char) * k);
-
+                char *output = (char *)malloc(sizeof(char) * k);   // String of comparison
+                Word *ordWord = (Word *)malloc(sizeof(Word) * k);  // Word to be compared ordered
+                char *unWord = (char *)malloc(sizeof(char) * k);   // Word to be compared unordered
+                int counter;                                       // Number of characters found in the right place
+                for (int i = 0; i < k; i++) {
+                    scanf("%c", &ordWord[i].w);
+                    unWord[i] = ordWord[i].w;
+                    ordWord[i].pos = i;
+                }
+                getchar();
+                tree_node *node = rb_search(remained, unWord);
+                if (node == NULL) {
+                    printf("not_exists");
+                } else {
+                    // TODO : remove the word from the tree
+                    attempts++;
+                    heap_sort(ordWord, k);
+                    do {
+                        if (ordWord[hw].w == orderRef[hr]) {
+                            if (unWord[ordWord[hw].pos] == orderRef[hr]) {
+                                output[ordWord[hw].pos] = '+';
+                                alphabet[h(orderRef[hr])].cert[alphabet[h(orderRef[hr])].icert++] = ordWord[hw].pos;
+                                counter++;
+                            } else {
+                                output[ordWord[hw].pos] = '|';
+                                alphabet[h(orderRef[hr])].forb[alphabet[h(orderRef[hr])].iforb++] = ordWord[hw].pos;
+                            }
+                            alphabet[h(orderRef[hr])].memb = 0;
+                            alphabet[h(orderRef[hr])].minApp++;
+                            hw++;
+                            hr++;
+                        } else {
+                            if (ordWord[hw].w > orderRef[hr])
+                                hr++;
+                            else if (ordWord[hw].w < orderRef[hr]) {
+                                // La lettera in word non compare in reference oppure è apparsa troppe volte
+                                output[ordWord[hw].pos] = '/';
+                                alphabet[h(ordWord[hr].w)].exactApp = alphabet[h(ordWord[hr].w)].minApp;
+                                if (alphabet[h(ordWord[hr].w)].exactApp == 0) {
+                                    alphabet[h(ordWord[hr].w)].memb = 1;
+                                }
+                                hw++;
+                            }
+                        }
+                        if (hr == k) {
+                            // The remaining characters in word are not in reference
+                            for (hw = hw; hw < k; hw++) {
+                                output[ordWord[hw].pos] = '/';
+                                alphabet[h(ordWord[hw].w)].exactApp = alphabet[h(ordWord[hw].w)].minApp;
+                                if (alphabet[h(ordWord[hw].w)].exactApp == 0) {
+                                    alphabet[h(ordWord[hw].w)].memb = 1;
+                                }
+                            }
+                        }
+                    } while (hw < k && hr < k);
+                    printf("%s\n", output);
+                }
             }
         }
     } while (flag);
