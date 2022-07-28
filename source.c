@@ -14,8 +14,8 @@ typedef struct {
 
 // Typedef to assign \, |
 typedef struct {
-    char w;
-    int pos;
+    char *w;
+    int *pos;
 } Word;
 
 // Typedef enum red, black
@@ -190,20 +190,25 @@ void reset_used(tree t) {
 
 // Heap sort an array of Word type
 void swap(Word *a, int pos1, int pos2) {
-    Word aux = a[pos1];
-    a[pos1] = a[pos2];
-    a[pos2] = aux;
+    int aux;
+    char let;
+    aux = a->pos[pos1];
+    let = a->w[pos1];
+    a->pos[pos1] = a->pos[pos2];
+    a->w[pos1] = a->w[pos2];
+    a->pos[pos2] = aux;
+    a->w[pos2] = let;
 }
 void max_heapify(Word *a, int i) {
     int l = 2 * i + 1;
     int r = 2 * i + 2;
     int largest;
-    if (l < e && a[l].w > a[i].w) {
+    if (l < e && a->w[l] > a->w[i]) {
         largest = l;
     } else {
         largest = i;
     }
-    if (r < e && a[r].w > a[largest].w) {
+    if (r < e && a->w[r] > a->w[largest]) {
         largest = r;
     }
     if (largest != i) {
@@ -292,19 +297,21 @@ void excludeOthers(tree t, Filter *f) {
     if (t != NULL) {
         excludeOthers(t->left, f);
         if (t->used == 0) {
-            int flag2 = 1;                                    // If the eligible word respects the filter
-            int c;                                            // Counts the number of the same character in the word
-            Word *actual = (Word *)malloc(sizeof(Word) * k);  // The word to be checked, in Word type
+            Word actual;  // The word to be checked, in Word type
+            actual.w = malloc(sizeof(char) * k);
+            actual.pos = malloc(sizeof(int) * k);
+            int flag2 = 1;  // If the eligible word respects the filter
+            int c;          // Counts the number of the same character in the word
             char letter;
             for (int i = 0; i < k; i++) {
                 letter = t->key[i];
-                actual[i].pos = i;
-                actual[i].w = letter;
+                actual.pos[i] = i;
+                actual.w[i] = letter;
             }
-            heap_sort(actual, k);
+            heap_sort(&actual, k);
             for (int i = 0; i < k && flag2; i++) {
                 // Check if the character cannot appear
-                if (f[h(actual[i].w)].memb) {
+                if (f[h(actual.w[i])].memb) {
                     flag2 = 0;
                     e--;
                     t->used = 1;
@@ -312,8 +319,8 @@ void excludeOthers(tree t, Filter *f) {
                 }
 
                 // Check if the character isn't in positions where it shouldn't appear
-                for (int j = 0; j < f[h(actual[i].w)].icert; j++) {
-                    if (actual[i].pos == f[h(actual[i].w)].cert[j]) {
+                for (int j = 0; j < f[h(actual.w[i])].icert; j++) {
+                    if (actual.pos[i] == f[h(actual.w[i])].cert[j]) {
                         flag2 = 0;
                         e--;
                         t->used = 1;
@@ -322,8 +329,8 @@ void excludeOthers(tree t, Filter *f) {
                 }
 
                 // Check if the character does not appear in position where it should appear
-                for (int j = 0; j < f[h(actual[i].w)].iforb; j++) {
-                    if (actual[i].pos != f[h(actual[i].w)].cert[j]) {
+                for (int j = 0; j < f[h(actual.w[i])].iforb; j++) {
+                    if (actual.pos[i] != f[h(actual.w[i])].cert[j]) {
                         flag2 = 0;
                         e--;
                         t->used = 1;
@@ -336,8 +343,8 @@ void excludeOthers(tree t, Filter *f) {
                 do {
                     c++;
                     i++;
-                } while (actual[i].w == actual[i - 1].w);
-                if (c < f[h(actual[i].w)].minApp) {
+                } while (actual.w[i] == actual.w[i - 1]);
+                if (c < f[h(actual.w[i])].minApp) {
                     flag2 = 0;
                     e--;
                     t->used = 1;
@@ -345,7 +352,7 @@ void excludeOthers(tree t, Filter *f) {
                 }
 
                 // Check exact appearances
-                if (f[h(actual[i].w)].minApp != -1 && c != f[h(actual[i].w)].exactApp) {
+                if (f[h(actual.w[i])].minApp != -1 && c != f[h(actual.w[i])].exactApp) {
                     flag2 = 0;
                     e--;
                     t->used = 1;
@@ -397,28 +404,26 @@ void play(int max, char *ref, tree *elig) {
                 }
             } else {
                 // It is a word
-                Word *orderRefMod = (Word *)malloc(sizeof(Word) * k);  // Temporary array of reference word
-                char *orderRef = (char *)malloc(sizeof(char) * k);     // The reference word in the order of the alphabet
-                int hw = 0;                                            // Head word
-                int hr = 0;                                            // Head reference
+                char *orderRef = (char *)malloc(sizeof(char) * k);  // The reference word in the order of the alphabet
+                int hw = 0;                                         // Head word
+                int hr = 0;                                         // Head reference
 
-                // Fill the temporary array of reference word, put it in the order of the alphabet and put it in the orderRef array
+                // Copy reference word in the order of the alphabet in orderRef
                 for (int i = 0; i < k; i++) {
-                    orderRefMod[i].w = ref[i];
+                    orderRef[i] = ref[i];
                 }
-                heap_sort(orderRefMod, k);
-                for (int i = 0; i < k; i++) {
-                    orderRef[i] = orderRefMod[i].w;
-                }
-                free(orderRefMod);
+                quick_sort(orderRef, 0, k - 1);
+
                 char *output = (char *)malloc(sizeof(char) * k);   // String of comparison
-                Word *ordWord = (Word *)malloc(sizeof(Word) * k);  // Word to be compared ordered
+                Word ordWord;  // Word to be compared ordered
+                ordWord.w = malloc(sizeof(char) * k);
+                ordWord.pos = malloc(sizeof(int) * k);
                 char *unWord = (char *)malloc(sizeof(char) * k);   // Word to be compared unordered
                 int counter;                                       // Number of characters found in the right place
                 for (int i = 0; i < k; i++) {
-                    if (scanf("%c", &ordWord[i].w) == EOF) break;
-                    unWord[i] = ordWord[i].w;
-                    ordWord[i].pos = i;
+                    if (scanf("%c", &ordWord.w[i]) == EOF) break;
+                    unWord[i] = ordWord.w[i];
+                    ordWord.pos[i] = i;
                 }
                 getchar();
                 tree_node *node = rb_search(*elig, unWord);
@@ -429,30 +434,30 @@ void play(int max, char *ref, tree *elig) {
                     node->used = 1;
                     e--;
                     attempts++;
-                    heap_sort(ordWord, k);
+                    heap_sort(&ordWord, k);
                     do {
-                        if (ordWord[hw].w == orderRef[hr]) {
-                            if (unWord[ordWord[hw].pos] == orderRef[hr]) {
-                                output[ordWord[hw].pos] = '+';
-                                alphabet[h(orderRef[hr])].cert[alphabet[h(orderRef[hr])].icert++] = ordWord[hw].pos;
+                        if (ordWord.w[hw] == orderRef[hr]) {
+                            if (unWord[ordWord.pos[hw]] == orderRef[hr]) {
+                                output[ordWord.pos[hw]] = '+';
+                                alphabet[h(orderRef[hr])].cert[alphabet[h(orderRef[hr])].icert++] = ordWord.pos[hw];
                                 counter++;
                             } else {
-                                output[ordWord[hw].pos] = '|';
-                                alphabet[h(orderRef[hr])].forb[alphabet[h(orderRef[hr])].iforb++] = ordWord[hw].pos;
+                                output[ordWord.pos[hw]] = '|';
+                                alphabet[h(orderRef[hr])].forb[alphabet[h(orderRef[hr])].iforb++] = ordWord.pos[hw];
                             }
                             alphabet[h(orderRef[hr])].memb = 0;
                             alphabet[h(orderRef[hr])].minApp++;
                             hw++;
                             hr++;
                         } else {
-                            if (ordWord[hw].w > orderRef[hr])
+                            if (ordWord.w[hw] > orderRef[hr])
                                 hr++;
-                            else if (ordWord[hw].w < orderRef[hr]) {
+                            else if (ordWord.w[hw] < orderRef[hr]) {
                                 // La lettera in word non compare in reference oppure è apparsa troppe volte
-                                output[ordWord[hw].pos] = '/';
-                                alphabet[h(ordWord[hr].w)].exactApp = alphabet[h(ordWord[hr].w)].minApp;
-                                if (alphabet[h(ordWord[hr].w)].exactApp == 0) {
-                                    alphabet[h(ordWord[hr].w)].memb = 1;
+                                output[ordWord.pos[hw]] = '/';
+                                alphabet[h(ordWord.w[hw])].exactApp = alphabet[h(ordWord.w[hw])].minApp;
+                                if (alphabet[h(ordWord.w[hr])].exactApp == 0) {
+                                    alphabet[h(ordWord.w[hr])].memb = 1;
                                 }
                                 hw++;
                             }
@@ -460,10 +465,10 @@ void play(int max, char *ref, tree *elig) {
                         if (hr == k) {
                             // The remaining characters in word are not in reference
                             for (hw = hw; hw < k; hw++) {
-                                output[ordWord[hw].pos] = '/';
-                                alphabet[h(ordWord[hw].w)].exactApp = alphabet[h(ordWord[hw].w)].minApp;
-                                if (alphabet[h(ordWord[hw].w)].exactApp == 0) {
-                                    alphabet[h(ordWord[hw].w)].memb = 1;
+                                output[ordWord.pos[hw]] = '/';
+                                alphabet[h(ordWord.w[hw])].exactApp = alphabet[h(ordWord.w[hw])].minApp;
+                                if (alphabet[h(ordWord.w[hw])].exactApp == 0) {
+                                    alphabet[h(ordWord.w[hw])].memb = 1;
                                 }
                             }
                         }
@@ -476,6 +481,10 @@ void play(int max, char *ref, tree *elig) {
                     }
                 }
                 excludeOthers(*elig, alphabet);
+                // free all malloc created in the else block
+                free(output);
+                free(unWord);
+                free(orderRef);
             }
         }
     } while (flag);
