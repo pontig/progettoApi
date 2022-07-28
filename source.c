@@ -37,6 +37,9 @@ typedef struct tree_node {
 // Typedef red-black tree
 typedef tree_node *tree;
 
+int k;      // lenght of the words
+int e = 0;  // Number of eligibles words
+
 // Red-black tree rotations
 void left_rotate(tree *root, tree_node *x) {
     tree_node *y = x->right;
@@ -126,7 +129,8 @@ void rb_insert(tree *t, char *key) {
     tree_node *x = *t;
     tree_node *z = (tree)malloc(sizeof(tree_node));
     z->key = key;
-    z->used = 1;
+    z->used = 0;
+    e++;
     z->left = NULL;
     z->right = NULL;
     z->color = RED;
@@ -153,16 +157,9 @@ void rb_insert(tree *t, char *key) {
 void inorder(tree t) {
     if (t != NULL) {
         inorder(t->left);
-        printf("\n%s ", t->key);
-        printf("Used: %d", t->used);
-        // printf("color %d", t->color);
-        // if (t->parent != NULL) {
-        //     printf("(father %s)", t->parent->key);
-        //     if (t == t->parent->right)
-        //         printf("(right)");
-        //     else
-        //         printf("(left)");
-        // }
+        if (!t->used) {
+            printf("%s\n", t->key);
+        }
         inorder(t->right);
     }
 }
@@ -185,13 +182,11 @@ tree_node *rb_search(tree t, char *key) {
 void reset_used(tree t) {
     if (t != NULL) {
         reset_used(t->left);
+        if (t->used) e++;
         t->used = 0;
         reset_used(t->right);
     }
 }
-
-int k;      // lenght of the words
-int e = 0;  // Number of eligibles words
 
 // Heap sort an array of Word type
 void swap(Word *a, int pos1, int pos2) {
@@ -230,6 +225,34 @@ void heap_sort(Word *a, int n) {
     }
 }
 
+// Quick sort an array of char
+void swapc(char *a, int pos1, int pos2) {
+    char aux = a[pos1];
+    a[pos1] = a[pos2];
+    a[pos2] = aux;
+}
+int partition(char *a, int p, int r) {
+    char x = a[r];
+    int i = p - 1;
+    int j = p;
+    while (j < r) {
+        if (a[j] <= x) {
+            i++;
+            swapc(a, i, j);
+        }
+        j++;
+    }
+    swapc(a, i + 1, r);
+    return i + 1;
+}
+void quick_sort(char *a, int p, int r) {
+    if (p < r) {
+        int q = partition(a, p, r);
+        quick_sort(a, p, q - 1);
+        quick_sort(a, q + 1, r);
+    }
+}
+
 // Return the position of the filter characters
 int h(int x) {
     if (x == 45) return 0;
@@ -244,8 +267,9 @@ int h(int x) {
 void ignoreLine() {
     char *line = NULL;
     size_t len = 0;
-    getline(&line, &len, stdin);
+    if (getline(&line, &len, stdin) == -1) return;
     free(line);
+    return;
 }
 
 void fillEligibles(tree *t) {
@@ -254,7 +278,7 @@ void fillEligibles(tree *t) {
         char c = getchar();
         ungetc(c, stdin);
         if (c != '+') {
-            fgets(i, k + 1, stdin);
+            if (fgets(i, k + 1, stdin) == NULL) break;
             getchar();
             rb_insert(t, i);
             e++;
@@ -262,6 +286,75 @@ void fillEligibles(tree *t) {
             return;
         }
     } while (1);
+}
+
+void excludeOthers(tree t, Filter *f) {
+    if (t != NULL) {
+        excludeOthers(t->left, f);
+        if (t->used == 0) {
+            int flag2 = 1;                                    // If the eligible word respects the filter
+            int c;                                            // Counts the number of the same character in the word
+            Word *actual = (Word *)malloc(sizeof(Word) * k);  // The word to be checked, in Word type
+            char letter;
+            for (int i = 0; i < k; i++) {
+                letter = t->key[i];
+                actual[i].pos = i;
+                actual[i].w = letter;
+            }
+            heap_sort(actual, k);
+            for (int i = 0; i < k && flag2; i++) {
+                // Check if the character cannot appear
+                if (f[h(actual[i].w)].memb) {
+                    flag2 = 0;
+                    e--;
+                    t->used = 1;
+                    return;
+                }
+
+                // Check if the character isn't in positions where it shouldn't appear
+                for (int j = 0; j < f[h(actual[i].w)].icert; j++) {
+                    if (actual[i].pos == f[h(actual[i].w)].cert[j]) {
+                        flag2 = 0;
+                        e--;
+                        t->used = 1;
+                        return;
+                    }
+                }
+
+                // Check if the character does not appear in position where it should appear
+                for (int j = 0; j < f[h(actual[i].w)].iforb; j++) {
+                    if (actual[i].pos != f[h(actual[i].w)].cert[j]) {
+                        flag2 = 0;
+                        e--;
+                        t->used = 1;
+                        return;
+                    }
+                }
+
+                // Check minimum appearances
+                c = 0;
+                do {
+                    c++;
+                    i++;
+                } while (actual[i].w == actual[i - 1].w);
+                if (c < f[h(actual[i].w)].minApp) {
+                    flag2 = 0;
+                    e--;
+                    t->used = 1;
+                    return;
+                }
+
+                // Check exact appearances
+                if (f[h(actual[i].w)].minApp != -1 && c != f[h(actual[i].w)].exactApp) {
+                    flag2 = 0;
+                    e--;
+                    t->used = 1;
+                    return;
+                }
+            }
+        }
+        excludeOthers(t->right, f);
+    }
 }
 
 void play(int max, char *ref, tree *elig) {
@@ -275,6 +368,7 @@ void play(int max, char *ref, tree *elig) {
         alphabet[i].minApp = 0;
         alphabet[i].icert = 0;
         alphabet[i].iforb = 0;
+        alphabet[i].exactApp = -1;
     }
 
     do {
@@ -297,8 +391,9 @@ void play(int max, char *ref, tree *elig) {
                     ignoreLine();
                     fillEligibles(elig);
                     ignoreLine();
+                    excludeOthers(*elig, alphabet);
                 } else if (c == 's') {
-                    // stampa_filtrate
+                    inorder(*elig);
                 }
             } else {
                 // It is a word
@@ -321,7 +416,7 @@ void play(int max, char *ref, tree *elig) {
                 char *unWord = (char *)malloc(sizeof(char) * k);   // Word to be compared unordered
                 int counter;                                       // Number of characters found in the right place
                 for (int i = 0; i < k; i++) {
-                    scanf("%c", &ordWord[i].w);
+                    if (scanf("%c", &ordWord[i].w) == EOF) break;
                     unWord[i] = ordWord[i].w;
                     ordWord[i].pos = i;
                 }
@@ -330,7 +425,9 @@ void play(int max, char *ref, tree *elig) {
                 if (node == NULL) {
                     printf("not_exists");
                 } else {
+                    counter = 0;
                     node->used = 1;
+                    e--;
                     attempts++;
                     heap_sort(ordWord, k);
                     do {
@@ -374,9 +471,11 @@ void play(int max, char *ref, tree *elig) {
                     if (counter == k) {
                         printf("ok\n");
                     } else {
-                        printf("%s", output);
+                        printf("%s\n", output);
+                        printf("%d\n", e);
                     }
                 }
+                excludeOthers(*elig, alphabet);
             }
         }
     } while (flag);
@@ -384,7 +483,7 @@ void play(int max, char *ref, tree *elig) {
 
 int main(int argc, char const *argv[]) {
     tree eligibiles = NULL;
-    scanf("%d\n", &k);
+    if (scanf("%d\n", &k) == EOF) return -1;
     char *ref = (char *)malloc(sizeof(char) * k);  // Reference word
     int max;                                       // Maximum number of attempts allowed
 
@@ -397,8 +496,8 @@ int main(int argc, char const *argv[]) {
 
         switch (command) {
             case 'n':  // nuova_partita
-                fgets(ref, k + 1, stdin);
-                scanf("%d\n", &max);
+                if (fgets(ref, k + 1, stdin) == NULL) break;
+                if (scanf("%d\n", &max) == EOF) break;
                 reset_used(eligibiles);
                 play(max, ref, &eligibiles);
                 break;
