@@ -1,0 +1,234 @@
+Dopo la lettura della parola KS06l abbiamo appreso che:
+Character 0:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character K:
+    not member
+
+
+
+Character S:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Dopo la lettura della parola okauE abbiamo appreso che:
+Character 0:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character E:
+    not member
+
+
+
+Character K:
+    not member
+
+
+
+Character S:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 
+Forb: 2, 
+
+
+Character k:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character u:
+    not member
+
+
+
+Dopo la lettura della parola -s9k0 abbiamo appreso che:
+Character -:
+    not member
+
+
+
+Character 0:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character E:
+    not member
+
+
+
+Character K:
+    not member
+
+
+
+Character S:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 
+Forb: 2, 
+
+
+Character k:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character s:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 1, 
+Forb: 
+
+
+Character u:
+    not member
+
+
+
+Dopo la lettura della parola sm_ks abbiamo appreso che:
+Character -:
+    not member
+
+
+
+Character 0:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character E:
+    not member
+
+
+
+Character K:
+    not member
+
+
+
+Character S:
+    not member
+
+
+
+Character _:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 
+Forb: 2, 
+
+
+Character k:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Character m:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character s:
+Member: 0
+MinApp: 2
+ExactApp: 2
+Cert: 1, 
+Forb: 4, 0, 
+
+
+Character u:
+    not member
+
+
+
