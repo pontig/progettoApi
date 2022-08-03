@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PROMPTALPH
+//#define PROMPTALPH
+//#define PROMPTREMOVE
 
 // Typedef for a linked list node
 typedef struct EL {
@@ -181,7 +182,7 @@ void inorder(tree t) {
     if (t != NULL) {
         inorder(t->left);
         if (!t->used) {
-             printf("%s\n", t->key);
+            printf("%s\n", t->key);
         }
         inorder(t->right);
     }
@@ -385,90 +386,107 @@ void fillEligibles(tree *t) {
     } while (1);
 }
 
-void excludeOthers(tree t, sureWord tillNow, Filter *f) {
+void excludeOthers(tree t, Filter *f) {
     if (t != NULL) {
-        excludeOthers(t->left, tillNow, f);
-
-        //printf("Pazzia:\n");
-        //inorder(t);
-
+        excludeOthers(t->left, f);
+        excludeOthers(t->right, f);
         if (!t->used) {
-            char *str = (char *)malloc(sizeof(char) * (k + 1));  // The word taken from the tree, in alphabetical order
-            strcpy(str, t->key);
-            quick_sort(str, 0, k - 1);
+            Word toCompare;   // t->key, but in alphabetical order
+            int head = 0;     // Head in toCompare
+            int i = -1;       // Iterator in f
+            int appears = 0;  // Times a certain char appears in toCompare
 
-            int i = k - 1;          // Position in the string t->key
-            int app = -1;           // Number of appearances of a certain character
-            List mandatory = NULL;  // List of mandatory positions
-            List forbidden = NULL;  // List of forbidden positions
-            if (tillNow != NULL) {
-                if (!checkMandatory(tillNow, t->key)) {
-                    t->used = 1;
+            toCompare.pos = (int *)malloc(sizeof(int) * k);
+            toCompare.w = (char *)malloc(sizeof(char) * k);
+            for (int i = 0; i < k; i++) {
+                toCompare.w[i] = t->key[i];
+                toCompare.pos[i] = i;
+            }
+            qs_mod(&toCompare, 0, k - 1);
+            do {
+                if (head == 0 || head == k || toCompare.w[head] != toCompare.w[head - 1]) {
+                    // New char
+                    // But first, check the previous char number of apppearances
+                    if (head != 0) {
+                        if (f[h(toCompare.w[head - 1])].exactApp != -1) {
+                            if (appears != f[h(toCompare.w[head - 1])].exactApp) {
+                                // This char does not appear exactly the number of times we want
+                                e--;
+                                t->used = 1;
+#ifdef PROMPTREMOVE
+                                printf("Removed %s because %c does not appear exactly %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].exactApp, appears, e);
+#endif
+                                return;
+                            }
+                        } else {
+                            if (appears < f[h(toCompare.w[head - 1])].minApp) {
+                                // This char does not appear at least the number of times we want
+                                e--;
+                                t->used = 1;
+#ifdef PROMPTREMOVE
+                                printf("Removed %s because %c does not appear at least %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].exactApp, appears, e);
+#endif
+                                return;
+                            }
+                        }
+                    }
+                    if (head != k) {
+                        // Now get the filters for the new char
+                        i++;
+                        while (i < h(toCompare.w[head])) {
+                            if (f[i].memb == 0) {
+                                // This char should appear but it doesn't
+                                e--;
+                                t->used = 1;
+#ifdef PROMPTREMOVE
+                                printf("Removed %s because %c does not appear (e=%d)\n", t->key, toCompare.w[head], e);
+#endif
+                                return;
+                            }
+                            i++;
+                        }
+
+                        // Now the new char: mandatoy and forbidden positions
+                        appears = 0;
+                        for (List forbidden = f[h(toCompare.w[head])].forb; forbidden != NULL; forbidden = forbidden->next) {
+                            if (toCompare.w[head] == t->key[forbidden->n]) {
+                                // This char appear in a forbidden position
+                                e--;
+                                t->used = 1;
+#ifdef PROMPTREMOVE
+                                printf("Removed %s because %c appear in position %d but it shouldn't (e=%d)\n", t->key, toCompare.w[head], forbidden->n, e);
+#endif
+                                return;
+                            }
+                        }
+                        for (List mandatory = f[h(toCompare.w[head])].cert; mandatory != NULL; mandatory = mandatory->next) {
+                            if (toCompare.w[head] != t->key[mandatory->n]) {
+                                // This char does not appear in a mandatory position
+                                e--;
+                                t->used = 1;
+#ifdef PROMPTREMOVE
+                                printf("Removed %s because %c does not appear in position %d but it should (e=%d)\n", t->key, toCompare.w[head], mandatory->n, e);
+#endif
+                                return;
+                            }
+                        }
+                    }
+                }
+                appears++;
+                head++;
+            } while (head <= k);
+            for (i++; i < 64; i++) {
+                if (f[i].memb == 0) {
+                    // This char should appear but it doesn't
                     e--;
+                    t->used = 1;
+#ifdef PROMPTREMOVE
+                    printf("Removed %s because %c does not appear * (e=%d)\n", t->key, toCompare.w[head], e);
+#endif
                     return;
                 }
             }
-            do {
-                char tempChar = str[i];
-                int tempPos = h(tempChar);
-
-                if (i == k - 1 || tempChar != str[i + 1]) {
-                    // It is a new character
-                    // Previous character: exact or minimum appearances
-                    if (i != k - 1 && f[h(str[i + 1])].memb != -1) {
-                        if (f[h(str[i + 1])].exactApp != -1) {
-                            if (app != f[h(str[i + 1])].exactApp) {
-                                t->used = 1;
-                                e--;
-                                return;
-                            }
-                        } else if (app < f[h(str[i + 1])].minApp) {
-                            t->used = 1;
-                            e--;
-                            return;
-                        }
-                    }
-
-                    // Now the "new" character
-                    if (f[tempPos].memb == -1) {
-                        // We haven't meet yet this char; therefore we cannot filter it
-                        i--;
-                        continue;
-                    }
-                    if (f[tempPos].memb == 1) {
-                        // The char should not appear
-                        t->used = 1;
-                        e--;
-                        return;
-                    }
-                    app = 1;
-                    mandatory = f[tempPos].cert;
-                    forbidden = f[tempPos].forb;
-
-                    while (forbidden != NULL) {
-                        if (tempChar == t->key[forbidden->n]) {
-                            t->used = 1;
-                            e--;
-                            return;
-                        }
-                        forbidden = forbidden->next;
-                    }
-
-                    while (mandatory != NULL) {
-                        if (tempChar != t->key[mandatory->n]) {
-                            t->used = 1;
-                            e--;
-                            return;
-                        }
-                        mandatory = mandatory->next;
-                    }
-                } else
-                    app++;
-                i--;
-            } while (i >= 0);
-            free(str);
         }
-        excludeOthers(t->right, tillNow, f);
     }
 }
 
@@ -511,7 +529,7 @@ void play(int max, char *ref, tree *elig) {
                     ignoreLine();
                     fillEligibles(elig);
                     ignoreLine();
-                    excludeOthers(*elig, oink, alphabet);
+                    excludeOthers(*elig, alphabet);
                 } else if (c == 's') {
                     ignoreLine();
                     inorder(*elig);
@@ -607,7 +625,7 @@ void play(int max, char *ref, tree *elig) {
                             }
                         } while (hw < k && hr < k && orderRef[hr] != '~' && ordWord.w[hw] != '~');
                         printf("%s\n", output);
-                        excludeOthers(*elig, oink, alphabet);
+                        excludeOthers(*elig, alphabet);
                         printf("%d\n", e);
                     }
 
