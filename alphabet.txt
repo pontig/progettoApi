@@ -1,51 +1,10 @@
-Dopo la lettura della parola KS06l abbiamo appreso che:
-Character 0:
+Dopo la lettura della parola laj74 abbiamo appreso che:
+Character 4:
     not member
 
 
 
-Character 6:
-    not member
-
-
-
-Character K:
-    not member
-
-
-
-Character S:
-    not member
-
-
-
-Character l:
-    not member
-
-
-
-Dopo la lettura della parola okauE abbiamo appreso che:
-Character 0:
-    not member
-
-
-
-Character 6:
-    not member
-
-
-
-Character E:
-    not member
-
-
-
-Character K:
-    not member
-
-
-
-Character S:
+Character 7:
     not member
 
 
@@ -55,133 +14,26 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 
-Forb: 2, 
+Forb: 1, 
 
 
-Character k:
+Character j:
     not member
 
 
 
 Character l:
-    not member
-
-
-
-Character o:
-    not member
-
-
-
-Character u:
-    not member
-
-
-
-Dopo la lettura della parola -s9k0 abbiamo appreso che:
-Character -:
-    not member
-
-
-
-Character 0:
-    not member
-
-
-
-Character 6:
-    not member
-
-
-
-Character 9:
-    not member
-
-
-
-Character E:
-    not member
-
-
-
-Character K:
-    not member
-
-
-
-Character S:
-    not member
-
-
-
-Character a:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 2, 
-
-
-Character k:
-    not member
-
-
-
-Character l:
-    not member
-
-
-
-Character o:
-    not member
-
-
-
-Character s:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 
-
-
-Character u:
     not member
 
 
 
 Dopo la lettura della parola sm_ks abbiamo appreso che:
-Character -:
+Character 4:
     not member
 
 
 
-Character 0:
-    not member
-
-
-
-Character 6:
-    not member
-
-
-
-Character 9:
-    not member
-
-
-
-Character E:
-    not member
-
-
-
-Character K:
-    not member
-
-
-
-Character S:
+Character 7:
     not member
 
 
@@ -196,12 +48,80 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 
-Forb: 2, 
+Forb: 1, 
+
+
+Character j:
+    not member
+
 
 
 Character k:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 
+Forb: 3, 
+
+
+Character l:
     not member
 
+
+
+Character m:
+    not member
+
+
+
+Character s:
+    not member
+
+
+
+Dopo la lettura della parola okauE abbiamo appreso che:
+Character 4:
+    not member
+
+
+
+Character 7:
+    not member
+
+
+
+Character E:
+Member: 0
+MinApp: 0
+ExactApp: -1
+Cert: 4, 
+Forb: 
+
+
+Character _:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 2, 
+Forb: 1, 
+
+
+Character j:
+    not member
+
+
+
+Character k:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 1, 
+Forb: 3, 
 
 
 Character l:
@@ -215,20 +135,23 @@ Character m:
 
 
 Character o:
-    not member
-
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 0, 
+Forb: 
 
 
 Character s:
-Member: 0
-MinApp: 2
-ExactApp: 2
-Cert: 1, 
-Forb: 4, 0, 
+    not member
+
 
 
 Character u:
-    not member
-
+Member: 0
+MinApp: 0
+ExactApp: -1
+Cert: 3, 
+Forb: 
 
 
