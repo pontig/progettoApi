@@ -4,6 +4,8 @@
 
 //#define PROMPTALPH
 //#define PROMPTREMOVE
+//#define MINA
+//#define PROMPTSORT
 
 // Typedef for a linked list node
 typedef struct EL {
@@ -144,7 +146,7 @@ void rb_insert(tree *t, char *key) {
     z->used = 0;
     e++;
 #ifdef PROMPTREMOVE
-    printf("Inserting %s (e=%d)\n", key, e);
+    // printf("Inserting %s (e=%d)\n", key, e);
 #endif
     z->left = NULL;
     z->right = NULL;
@@ -227,12 +229,12 @@ void max_heapify(Word *a, int n, int i) {
     int l = 2 * i + 1;
     int r = 2 * i + 2;
     int largest;
-    if (l < n && a->w[l] > a->w[i]) {
+    if (l < n && (a->w[l] > a->w[i] || (a->w[l] == a->w[i] && a->pos[l] > a->pos[i]))) {
         largest = l;
     } else {
         largest = i;
     }
-    if (r < n && a->w[r] > a->w[largest]) {
+    if (r < n && (a->w[r] > a->w[largest] || (a->w[r] == a->w[largest] && a->pos[r] > a->pos[largest]))) {
         largest = r;
     }
     if (largest != i) {
@@ -382,7 +384,7 @@ void excludeOthers(tree t, Filter *f) {
                                 e--;
                                 t->used = 1;
 #ifdef PROMPTREMOVE
-                                printf("Removed %s because %c does not appear at least %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].exactApp, appears, e);
+                                printf("Removed %s because %c does not appear at least %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].minApp, appears, e);
 #endif
                                 free(toCompare.w);
                                 free(toCompare.pos);
@@ -399,7 +401,7 @@ void excludeOthers(tree t, Filter *f) {
                                 e--;
                                 t->used = 1;
 #ifdef PROMPTREMOVE
-                                printf("Removed %s because %c does not appear (e=%d)\n", t->key, toCompare.w[head], e);
+                                printf("Removed %s because %c does not appear but it should (e=%d)\n", t->key, toCompare.w[head], e);
 #endif
                                 free(toCompare.w);
                                 free(toCompare.pos);
@@ -447,7 +449,7 @@ void excludeOthers(tree t, Filter *f) {
                     e--;
                     t->used = 1;
 #ifdef PROMPTREMOVE
-                    printf("Removed %s because %c does not appear * (e=%d)\n", t->key, toCompare.w[head], e);
+                    printf("Removed %s because %d does not appear * (e=%d)\n", t->key, i, e);
 #endif
                     free(toCompare.w);
                     free(toCompare.pos);
@@ -483,6 +485,8 @@ void play(int max, char *ref, tree *elig) {
 
 #ifdef PROMPTALPH
     FILE *fpalphabet = fopen("alphabet.txt", "w");
+    fprintf(fpalphabet, "NUOVA PARTITA\n\n");
+    printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
 
     // Set every minappears to 0
@@ -553,16 +557,23 @@ void play(int max, char *ref, tree *elig) {
                     attempts++;
 
                     // Update the filter
-                    char tempMinApps[64] = {0};  // Appearences of each char in this string
+                    char tempMinApps[64];  // Appearences of each char in this string
+                    for (int i = 0; i < 64; i++) {
+                        tempMinApps[i] = 0;
+                    }
+
                     for (int i = 0; i < k; i++) {
                         if (ordWord.w[i] == orderRef[i]) {
                             counter++;
                             alphabet[h(ordWord.w[i])].memb = 0;
-                            tempMinApps[h(ordWord.w[hw])]++;
-                            if (tempMinApps[h(ordWord.w[hw])] > alphabet[h(ordWord.w[hw])].minApp)
+                            tempMinApps[h(ordWord.w[i])]++;
+                            if (tempMinApps[h(ordWord.w[i])] > alphabet[h(ordWord.w[i])].minApp)
                                 alphabet[h(ordWord.w[i])].minApp = tempMinApps[h(ordWord.w[i])];
                             head_insert(&alphabet[h(ordWord.w[i])].cert, ordWord.pos[i]);
 
+#ifdef MINA
+                            printf("Stringa %s: il carattere %c è apparso 'correttamente' %d volte, contro le %d che vi sono nel filtro\n", unWord, ordWord.w[i], alphabet[h(ordWord.w[i])].minApp, alphabet[h(ordWord.w[i])].minApp);
+#endif
                             output[i] = '+';
                             ordWord.w[i] = '~';
                             orderRef[i] = '~';
@@ -573,7 +584,16 @@ void play(int max, char *ref, tree *elig) {
                         flag = 0;
                     } else {
                         quick_sort(orderRef, 0, k - 1);
-                        qs_mod(&ordWord, 0, k - 1);
+                        //qs_mod(&ordWord, 0, k - 1);
+                        heap_sort(&ordWord, k);
+#ifdef PROMPTSORT
+                        for (int i = 0; i < k; i++) {
+                            printf("%c ", ordWord.w[i]);
+                            printf("%d\n", ordWord.pos[i]);
+                        }
+
+#endif
+
                         do {
                             // Filters for / , |
                             if (orderRef[hr] == ordWord.w[hw]) {
@@ -581,6 +601,10 @@ void play(int max, char *ref, tree *elig) {
                                 output[ordWord.pos[hw]] = '|';
                                 alphabet[h(ordWord.w[hw])].memb = 0;
                                 tempMinApps[h(ordWord.w[hw])]++;
+
+#ifdef MINA
+                                printf("Stringa %s: il carattere %c è apparso 'correttamente' %d volte, contro le %d che vi sono nel filtro\n", unWord, ordWord.w[hw], tempMinApps[h(ordWord.w[hw])], alphabet[h(ordWord.w[hw])].minApp);
+#endif
                                 if (tempMinApps[h(ordWord.w[hw])] > alphabet[h(ordWord.w[hw])].minApp)
                                     alphabet[h(ordWord.w[hw])].minApp = tempMinApps[h(ordWord.w[hw])];
                                 head_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
@@ -650,6 +674,9 @@ void play(int max, char *ref, tree *elig) {
         freeAlphabet(&alphabet[i].forb);
         freeAlphabet(&alphabet[i].cert);
     }
+#ifdef PROMPTALPH
+    fclose(fpalphabet);
+#endif
     return;
 }
 

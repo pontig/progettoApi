@@ -28,12 +28,12 @@ void max_heapify(Word *a, int n, int i) {
     int l = 2 * i + 1;
     int r = 2 * i + 2;
     int largest;
-    if (l < n && a->w[l] > a->w[i]) {
+    if (l < n && (a->w[l] > a->w[i] || (a->w[l] == a->w[i] && a->pos[l] < a->pos[i]))) {
         largest = l;
     } else {
         largest = i;
     }
-    if (r < n && a->w[r] > a->w[largest]) {
+    if (r < n && (a->w[r] > a->w[largest] || (a->w[r] == a->w[largest] && a->pos[r] < a->pos[largest]))) {
         largest = r;
     }
     if (largest != i) {
@@ -64,19 +64,26 @@ int main() {
     a.w = (char *)malloc((k + 1) * sizeof(char));
     a.pos = (int *)malloc((k + 1) * sizeof(int));
 
-    for (int i = 0; i < k + 1; i++) {
-        scanf("%c", &a.w[i]);
-        a.pos[i] = i;
+    for (int paosjd = 0; paosjd < 15; paosjd++) {
+        /* code */
+
+        for (int i = 0; i < k + 1; i++) {
+            scanf("%c", &a.w[i]);
+            a.pos[i] = i;
+        }
+
+        printf("%s\n", a.w);
+        heap_sort(&a, k);
+
+        for (int i = 0; i < k; i++) {
+            printf("%c", a.w[i]);
+        }
+        printf("\n");
+        for (int i = 0; i < k; i++) {
+            printf("%d", a.pos[i]);
+        }
+        printf("\n===============\n");
     }
 
-    printf("%s\n", a.w);
-    heap_sort(&a, k);
-
-    for (int i = 0; i < k; i++) {
-        printf("%c", a.w[i]);
-    }
-    printf("\n");
-    for (int i = 0; i < k; i++) {
-        printf("%d", a.pos[i]);
-    }
+    return 0;
 }
