@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define PROMPTALPH
+#define PROMPTALPH
 //#define PROMPTREMOVE
 //#define MINA
 //#define PROMPTSORT
@@ -45,6 +45,33 @@ typedef tree_node *tree;
 
 int k;      // lenght of the words
 int e = 0;  // Number of eligibles words
+
+// Insert a new node  in the list ordered, void and without duplicates
+void order_insert(List *l, int n) {
+    List new = malloc(sizeof(Element));
+    new->n = n;
+    new->next = NULL;
+    if (*l == NULL) {
+        *l = new;
+    } else {
+        List aux = *l;
+        if (aux->next == NULL && aux->n == n) {
+            free(new);
+            return;
+        }
+        while (aux->next != NULL && aux->next->n < n) {
+            aux = aux->next;
+        }
+        if (aux->next == NULL) {
+            aux->next = new;
+        } else if (aux->next->n == n || aux->n == n) {
+            free(new);
+        } else {
+            new->next = aux->next;
+            aux->next = new;
+        }
+    }
+}
 
 // Head insert a new node in the list, type void
 void head_insert(List *l, int n) {
@@ -486,7 +513,7 @@ void play(int max, char *ref, tree *elig) {
 #ifdef PROMPTALPH
     FILE *fpalphabet = fopen("alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
-    printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
+    //printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
 
     // Set every minappears to 0
@@ -569,7 +596,7 @@ void play(int max, char *ref, tree *elig) {
                             tempMinApps[h(ordWord.w[i])]++;
                             if (tempMinApps[h(ordWord.w[i])] > alphabet[h(ordWord.w[i])].minApp)
                                 alphabet[h(ordWord.w[i])].minApp = tempMinApps[h(ordWord.w[i])];
-                            head_insert(&alphabet[h(ordWord.w[i])].cert, ordWord.pos[i]);
+                            order_insert(&alphabet[h(ordWord.w[i])].cert, ordWord.pos[i]);
 
 #ifdef MINA
                             printf("Stringa %s: il carattere %c è apparso 'correttamente' %d volte, contro le %d che vi sono nel filtro\n", unWord, ordWord.w[i], alphabet[h(ordWord.w[i])].minApp, alphabet[h(ordWord.w[i])].minApp);
@@ -584,7 +611,7 @@ void play(int max, char *ref, tree *elig) {
                         flag = 0;
                     } else {
                         quick_sort(orderRef, 0, k - 1);
-                        //qs_mod(&ordWord, 0, k - 1);
+                        // qs_mod(&ordWord, 0, k - 1);
                         heap_sort(&ordWord, k);
 #ifdef PROMPTSORT
                         for (int i = 0; i < k; i++) {
@@ -607,13 +634,13 @@ void play(int max, char *ref, tree *elig) {
 #endif
                                 if (tempMinApps[h(ordWord.w[hw])] > alphabet[h(ordWord.w[hw])].minApp)
                                     alphabet[h(ordWord.w[hw])].minApp = tempMinApps[h(ordWord.w[hw])];
-                                head_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
+                                order_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
                                 hr++;
                                 hw++;
                             } else if (orderRef[hr] > ordWord.w[hw]) {
                                 // Wrong character
                                 output[ordWord.pos[hw]] = '/';
-                                head_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
+                                order_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
                                 alphabet[h(ordWord.w[hw])].exactApp = alphabet[h(ordWord.w[hw])].minApp;
                                 if (alphabet[h(ordWord.w[hw])].minApp == 0) alphabet[h(ordWord.w[hw])].memb = 1;
                                 hw++;
@@ -624,7 +651,7 @@ void play(int max, char *ref, tree *elig) {
                                 // Remaining characters
                                 for (; hw < k && ordWord.w[hw] != '~'; hw++) {
                                     output[ordWord.pos[hw]] = '/';
-                                    head_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
+                                    order_insert(&alphabet[h(ordWord.w[hw])].forb, ordWord.pos[hw]);
                                     alphabet[h(ordWord.w[hw])].exactApp = alphabet[h(ordWord.w[hw])].minApp;
                                     if (alphabet[h(ordWord.w[hw])].minApp == 0) alphabet[h(ordWord.w[hw])].memb = 1;
                                 }

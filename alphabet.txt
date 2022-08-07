@@ -46,7 +46,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 
-Forb: 4, 3, 
+Forb: 3, 4, 
 
 
 Character l:
@@ -83,7 +83,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 4, 3, 
+Forb: 3, 4, 
 
 
 Character l:
@@ -111,7 +111,7 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 3, 3, 
+Cert: 3, 
 Forb: 1, 
 
 
@@ -128,7 +128,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 0, 4, 3, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -156,7 +156,7 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 3, 3, 
+Cert: 3, 
 Forb: 1, 
 
 
@@ -164,7 +164,7 @@ Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 2, 0, 
+Cert: 0, 2, 
 Forb: 1, 
 
 
@@ -173,7 +173,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 4, 0, 4, 3, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -201,7 +201,7 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 3, 3, 
+Cert: 3, 
 Forb: 1, 
 
 
@@ -209,7 +209,7 @@ Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 2, 2, 0, 
+Cert: 0, 2, 4, 
 Forb: 1, 
 
 
@@ -218,7 +218,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 4, 0, 4, 3, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -246,16 +246,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 
-Forb: 2, 1, 
+Cert: 3, 
+Forb: 1, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character d:
@@ -263,7 +263,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 0, 4, 0, 4, 3, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -291,16 +291,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 
-Forb: 2, 1, 
+Cert: 3, 
+Forb: 1, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -313,7 +313,7 @@ Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 0, 4, 0, 4, 3, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -341,16 +341,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 
-Forb: 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -362,8 +362,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 1, 1, 
-Forb: 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 4, 
 
 
 Character l:
@@ -391,16 +391,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 
-Forb: 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -412,8 +412,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -441,16 +441,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -462,8 +462,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -491,16 +491,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 2
 ExactApp: -1
-Cert: 2, 0, 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -512,8 +512,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -541,16 +541,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 3
 ExactApp: 3
-Cert: 4, 2, 0, 2, 0, 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -562,8 +562,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -591,16 +591,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 3
 ExactApp: 3
-Cert: 4, 2, 4, 2, 0, 2, 0, 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -612,8 +612,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -641,16 +641,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 3
 ExactApp: 3
-Cert: 4, 2, 4, 2, 4, 2, 0, 2, 0, 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -662,8 +662,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
@@ -691,16 +691,16 @@ Character G:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-Forb: 0, 0, 2, 1, 
+Cert: 3, 
+Forb: 1, 0, 2, 
 
 
 Character N:
 Member: 0
 MinApp: 3
 ExactApp: 3
-Cert: 4, 2, 0, 4, 2, 4, 2, 4, 2, 0, 2, 0, 4, 0, 4, 4, 4, 0, 4, 4, 2, 2, 0, 
-Forb: 1, 1, 1, 
+Cert: 0, 2, 4, 
+Forb: 1, 
 
 
 Character b:
@@ -712,8 +712,8 @@ Character d:
 Member: 0
 MinApp: 1
 ExactApp: 1
-Cert: 1, 1, 1, 1, 1, 1, 1, 1, 
-Forb: 2, 0, 4, 0, 4, 3, 
+Cert: 1, 
+Forb: 3, 0, 2, 4, 
 
 
 Character l:
