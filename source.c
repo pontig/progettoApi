@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PROMPTALPH
+//#define PROMPTALPH
 //#define PROMPTREMOVE
 //#define MINA
 //#define PROMPTSORT
@@ -393,25 +393,26 @@ void excludeOthers(tree t, Filter *f) {
                     // New char
                     // But first, check the previous char number of apppearances
                     if (head != 0) {
-                        if (f[h(toCompare.w[head - 1])].exactApp != -1) {
-                            if (appears != f[h(toCompare.w[head - 1])].exactApp) {
+                        int headMinusOne = h(toCompare.w[head - 1]);
+                        if (f[headMinusOne].exactApp != -1) {
+                            if (appears != f[headMinusOne].exactApp) {
                                 // This char does not appear exactly the number of times we want
                                 e--;
                                 t->used = 1;
 #ifdef PROMPTREMOVE
-                                printf("Removed %s because %c does not appear exactly %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].exactApp, appears, e);
+                                printf("Removed %s because %c does not appear exactly %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[headMinusOne].exactApp, appears, e);
 #endif
                                 free(toCompare.w);
                                 free(toCompare.pos);
                                 return;
                             }
                         } else {
-                            if (appears < f[h(toCompare.w[head - 1])].minApp) {
+                            if (appears < f[headMinusOne].minApp) {
                                 // This char does not appear at least the number of times we want
                                 e--;
                                 t->used = 1;
 #ifdef PROMPTREMOVE
-                                printf("Removed %s because %c does not appear at least %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[h(toCompare.w[head - 1])].minApp, appears, e);
+                                printf("Removed %s because %c does not appear at least %d times but %d (e=%d)\n", t->key, toCompare.w[head - 1], f[headMinusOne].minApp, appears, e);
 #endif
                                 free(toCompare.w);
                                 free(toCompare.pos);
@@ -513,7 +514,7 @@ void play(int max, char *ref, tree *elig) {
 #ifdef PROMPTALPH
     FILE *fpalphabet = fopen("alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
-    //printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
+    // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
 
     // Set every minappears to 0
