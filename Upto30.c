@@ -3,7 +3,7 @@
 #include <string.h>
 
 //#define PROMPTALPH
-#define PROMPTREMOVE
+//#define PROMPTREMOVE
 //#define MINA
 //#define PROMPTSORT
 
