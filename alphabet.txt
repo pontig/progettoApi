@@ -1,12 +1,17 @@
 NUOVA PARTITA
 
-Dopo la lettura della parola mGAdA abbiamo appreso che:
-Character A:
+Dopo la lettura della parola laj74 abbiamo appreso che:
+Character 4:
     not member
 
 
 
-Character G:
+Character 7:
+    not member
+
+
+
+Character a:
 Member: 0
 MinApp: 1
 ExactApp: -1
@@ -14,7 +19,46 @@ Cert:
 Forb: 1, 
 
 
-Character d:
+Character j:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Dopo la lettura della parola sm_ks abbiamo appreso che:
+Character 4:
+    not member
+
+
+
+Character 7:
+    not member
+
+
+
+Character _:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 
+Forb: 1, 
+
+
+Character j:
+    not member
+
+
+
+Character k:
 Member: 0
 MinApp: 1
 ExactApp: -1
@@ -22,33 +66,6 @@ Cert:
 Forb: 3, 
 
 
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola lAmGd abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 3, 
-Forb: 1, 
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 3, 4, 
-
-
 Character l:
     not member
 
@@ -59,31 +76,54 @@ Character m:
 
 
 
-Dopo la lettura della parola Cdmmm abbiamo appreso che:
-Character A:
+Character s:
     not member
 
 
 
-Character C:
+Dopo la lettura della parola okauE abbiamo appreso che:
+Character 4:
     not member
 
 
 
-Character G:
+Character 7:
+    not member
+
+
+
+Character E:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 3, 
+Cert: 4, 
+Forb: 
+
+
+Character _:
+    not member
+
+
+
+Character a:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 2, 
 Forb: 1, 
 
 
-Character d:
+Character j:
+    not member
+
+
+
+Character k:
 Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 1, 
-Forb: 3, 4, 
+Forb: 3, 
 
 
 Character l:
@@ -96,633 +136,24 @@ Character m:
 
 
 
-Dopo la lettura della parola dNmGA abbiamo appreso che:
-Character A:
+Character o:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 0, 
+Forb: 
+
+
+Character s:
     not member
 
 
 
-Character C:
-    not member
-
-
-
-Character G:
+Character u:
 Member: 0
 MinApp: 1
 ExactApp: -1
 Cert: 3, 
-Forb: 1, 
-
-
-Character N:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 1, 
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NCNld abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 3, 
-Forb: 1, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 
-Forb: 1, 
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola CANlN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 3, 
-Forb: 1, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola dNGGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NbbGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola GdmGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 0, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola AddGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NdmGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NdNGA abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 2
-ExactApp: -1
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NNNGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 3
-ExactApp: 3
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola GdNGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 3
-ExactApp: 3
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola AdNGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 3
-ExactApp: 3
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
-
-
-Dopo la lettura della parola NdNGN abbiamo appreso che:
-Character A:
-    not member
-
-
-
-Character C:
-    not member
-
-
-
-Character G:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 3, 
-Forb: 1, 0, 2, 
-
-
-Character N:
-Member: 0
-MinApp: 3
-ExactApp: 3
-Cert: 0, 2, 4, 
-Forb: 1, 
-
-
-Character b:
-    not member
-
-
-
-Character d:
-Member: 0
-MinApp: 1
-ExactApp: 1
-Cert: 1, 
-Forb: 3, 0, 2, 4, 
-
-
-Character l:
-    not member
-
-
-
-Character m:
-    not member
-
+Forb: 
 
 

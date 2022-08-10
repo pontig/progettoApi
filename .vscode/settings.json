@@ -3,6 +3,7 @@
         "typeinfo": "c",
         "header.h": "c",
         "trees.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "*.tcc": "c"
     }
 }

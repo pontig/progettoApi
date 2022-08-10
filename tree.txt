@@ -1,0 +1,129 @@
+Tree:
+Parola 8adfs (1):
+Colore: BLACK
+ordinata: 8adfs
+Chiavi:
+	-s apparsa nelle posizioni 4, 
+	-f apparsa nelle posizioni 3, 
+	-d apparsa nelle posizioni 2, 
+	-a apparsa nelle posizioni 1, 
+	-8 apparsa nelle posizioni 0, 
+
+Parola 5sjaH (2):
+Colore: RED
+ordinata: 5Hajs
+Chiavi:
+	-s apparsa nelle posizioni 1, 
+	-j apparsa nelle posizioni 2, 
+	-a apparsa nelle posizioni 3, 
+	-H apparsa nelle posizioni 4, 
+	-5 apparsa nelle posizioni 0, 
+
+Parola KS06l (3):
+Colore: RED
+ordinata: 06KSl
+Chiavi:
+	-l apparsa nelle posizioni 4, 
+	-S apparsa nelle posizioni 1, 
+	-K apparsa nelle posizioni 0, 
+	-6 apparsa nelle posizioni 3, 
+	-0 apparsa nelle posizioni 2, 
+
+Parola Hi23a (4):
+Colore: RED
+ordinata: 23Hai
+Chiavi:
+	-i apparsa nelle posizioni 1, 
+	-a apparsa nelle posizioni 4, 
+	-H apparsa nelle posizioni 0, 
+	-3 apparsa nelle posizioni 3, 
+	-2 apparsa nelle posizioni 2, 
+
+Parola laj74 (5):
+Colore: RED
+ordinata: 47ajl
+Chiavi:
+	-l apparsa nelle posizioni 0, 
+	-j apparsa nelle posizioni 2, 
+	-a apparsa nelle posizioni 1, 
+	-7 apparsa nelle posizioni 3, 
+	-4 apparsa nelle posizioni 4, 
+
+Parola -s9k0 (6):
+Colore: RED
+ordinata: -09ks
+Chiavi:
+	-s apparsa nelle posizioni 1, 
+	-k apparsa nelle posizioni 3, 
+	-9 apparsa nelle posizioni 2, 
+	-0 apparsa nelle posizioni 4, 
+	-- apparsa nelle posizioni 0, 
+
+Parola sm_ks (7):
+Colore: RED
+ordinata: _kmss
+Chiavi:
+	-s apparsa nelle posizioni 0, 4, 
+	-m apparsa nelle posizioni 1, 
+	-k apparsa nelle posizioni 3, 
+	-_ apparsa nelle posizioni 2, 
+
+Parola okauE (8):
+Colore: BLACK
+ordinata: Eakou
+Chiavi:
+	-u apparsa nelle posizioni 3, 
+	-o apparsa nelle posizioni 0, 
+	-k apparsa nelle posizioni 1, 
+	-a apparsa nelle posizioni 2, 
+	-E apparsa nelle posizioni 4, 
+
+Parola PsjW5 (4):
+Colore: RED
+ordinata: 5PWjs
+Chiavi:
+	-s apparsa nelle posizioni 1, 
+	-j apparsa nelle posizioni 2, 
+	-W apparsa nelle posizioni 3, 
+	-P apparsa nelle posizioni 0, 
+	-5 apparsa nelle posizioni 4, 
+
+Parola asHdd (5):
+Colore: BLACK
+ordinata: Hadds
+Chiavi:
+	-s apparsa nelle posizioni 1, 
+	-d apparsa nelle posizioni 3, 4, 
+	-a apparsa nelle posizioni 0, 
+	-H apparsa nelle posizioni 2, 
+
+Parola paF7s (6):
+Colore: RED
+ordinata: 7Faps
+Chiavi:
+	-s apparsa nelle posizioni 4, 
+	-p apparsa nelle posizioni 0, 
+	-a apparsa nelle posizioni 1, 
+	-F apparsa nelle posizioni 2, 
+	-7 apparsa nelle posizioni 3, 
+
+Parola _fah- (3):
+Colore: RED
+ordinata: -_afh
+Chiavi:
+	-h apparsa nelle posizioni 3, 
+	-f apparsa nelle posizioni 1, 
+	-a apparsa nelle posizioni 2, 
+	-_ apparsa nelle posizioni 0, 
+	-- apparsa nelle posizioni 4, 
+
+Parola 0D7dj (4):
+Colore: BLACK
+ordinata: 07Ddj
+Chiavi:
+	-j apparsa nelle posizioni 4, 
+	-d apparsa nelle posizioni 3, 
+	-D apparsa nelle posizioni 1, 
+	-7 apparsa nelle posizioni 2, 
+	-0 apparsa nelle posizioni 0, 
+
