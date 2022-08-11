@@ -509,7 +509,7 @@ void play(int max, char *ref, tree *elig) {
     Filter alphabet[64];  // Array of filters, one for each character
 
 #ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("alphabet.txt", "w");
+    FILE *fpalphabet = fopen("../debug/alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
     // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif

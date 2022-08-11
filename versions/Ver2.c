@@ -435,7 +435,7 @@ void rb_insert(tree *t, char *key) {
     rb_insert_fixup(t, z);
 
 #ifdef PROMPTTREE
-    FILE *fptree = fopen("tree.txt", "a");
+    FILE *fptree = fopen("../debug/tree.txt", "a");
     fprintf(fptree, "Parola %s (%d):\n", key, e);
     fprintf(fptree, "Colore: %s\n", z->color == RED ? "RED" : "BLACK");
     fprintf(fptree, "ordinata: %s\n", z->ordered);
@@ -620,7 +620,7 @@ void freeCharFilter(CharFilter head) {
         freeCharFilter(head->next);
         freeList(head->pos);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("tree.txt", "a");
+        FILE *f = fopen("../debug/tree.txt", "a");
         fprintf(f, "\tFreeing %c\n", head->c);
         fclose(f);
 #endif
@@ -632,7 +632,7 @@ void freeTree(tree root) {
         freeTree(root->left);
         freeTree(root->right);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("tree.txt", "a");
+        FILE *f = fopen("../debug/tree.txt", "a");
         fprintf(f, "\nFreeing %s\n", root->key);
         fclose(f);
 #endif
@@ -655,7 +655,7 @@ void play(int max, char *ref, tree *elig) {
     Filter alphabet[64];  // Array of filters, one for each character
 
 #ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("alphabet.txt", "w");
+    FILE *fpalphabet = fopen("../debug/alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
     // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
@@ -856,7 +856,7 @@ void play(int max, char *ref, tree *elig) {
 
 int main(int argc, char const *argv[]) {
 #ifdef PROMPTTREE
-    FILE *aaa = fopen("tree.txt", "w");
+    FILE *aaa = fopen("../debug/tree.txt", "w");
     fprintf(aaa, "Tree:\n");
     fclose(aaa);
 #endif
