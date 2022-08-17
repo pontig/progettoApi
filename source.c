@@ -4,7 +4,7 @@
 
 //#define PROMPTALPH
 //#define PROMPTREMOVE
-#define PROMPTTREE
+//#define PROMPTTREE
 //#define MINA
 //#define PROMPTSORT
 
@@ -22,12 +22,15 @@ typedef struct FM {
 } Track;
 typedef Track *Positions;
 
-typedef struct {
+typedef struct E {
     int memb;       // If the char is NOT a member of ref
     Positions pos;  // Mandatory and Forbidden positions
     int minApp;     // Minimum number of appearances
     int exactApp;   // Exact number of appearances
+    struct E *left;
+    struct E *right;
 } Filter;
+typedef Filter * Alph;
 typedef struct CH {
     char c;    // The char
     int app;   // How many times it appears
@@ -59,8 +62,10 @@ typedef struct tree_node {
 } tree_node;
 typedef tree_node *tree;
 
-int k;      // lenght of the words
-int e = 0;  // Number of eligibles words
+int k;          // lenght of the words
+int e = 0;      // Number of eligibles words
+int emax = 0;   // Number of elements in the tree
+int match = 0;  // Number of the match in progress
 
 // Insert a new node  in the list ordered, void and without duplicates
 void order_insert(List *l, int n) {
@@ -194,7 +199,7 @@ void right_rotate(tree *root, tree_node *y) {
 void inorder(tree t) {
     if (t != NULL) {
         inorder(t->left);
-        if (!t->used) {
+        if (t->used < match) {
             printf("%s\n", t->key);
         }
         inorder(t->right);
@@ -219,7 +224,7 @@ tree_node *rb_search(tree t, char *key) {
 void reset_used(tree t) {
     if (t != NULL) {
         reset_used(t->left);
-        if (t->used) {
+        if (t->used == match) {
             e++;
         }
         t->used = 0;
@@ -410,6 +415,7 @@ void rb_insert(tree *t, char *key) {
     z->key = key;
     z->used = 0;
     e++;
+    emax++;
 #ifdef PROMPTREMOVE
     // printf("Inserting %s (e=%d)\n", key, e);
 #endif
@@ -435,7 +441,7 @@ void rb_insert(tree *t, char *key) {
     rb_insert_fixup(t, z);
 
 #ifdef PROMPTTREE
-    FILE *fptree = fopen("debug/tree.txt", "a");
+    FILE *fptree = fopen("../debug/tree.txt", "a");
     fprintf(fptree, "Parola %s (%d):\n", key, e);
     fprintf(fptree, "Colore: %s\n", z->color == RED ? "RED" : "BLACK");
     fprintf(fptree, "ordinata: %s\n", z->ordered);
@@ -503,14 +509,14 @@ void excludeOthers(tree t, Filter *f) {
         excludeOthers(t->left, f);
         excludeOthers(t->right, f);
 
-        if (!t->used) {
+        if (t->used < match) {
             int i = 63;
             for (CharFilter chars = t->chars; chars != NULL; chars = chars->next) {
                 int hh = h(chars->c);
                 while (i >= 0 && hh != i) {
                     if (f[i].memb == 0) {
                         // There is a char > chars->c that should appear but it doesn't
-                        t->used = 1;
+                        t->used = match;
                         e--;
 #ifdef PROMPTREMOVE
                         printf("Removing %s because %c does not appear but it should, > (e=%d)\n", t->key, hm1(i), e);
@@ -522,7 +528,7 @@ void excludeOthers(tree t, Filter *f) {
                 if (f[i].memb == -1) continue;
                 if (f[i].memb == 1) {
                     // chars->c should not appear
-                    t->used = 1;
+                    t->used = match;
                     e--;
 #ifdef PROMPTREMOVE
                     printf("Removing %s because %c should not appear but it does (e=%d)\n", t->key, chars->c, e);
@@ -533,7 +539,7 @@ void excludeOthers(tree t, Filter *f) {
                     // Ok, chars->c should appear and it does
                     if (f[i].exactApp != -1 && chars->app != f[i].exactApp) {
                         // It should appear exactly f[i].exactApp times but it doesn't
-                        t->used = 1;
+                        t->used = match;
                         e--;
 #ifdef PROMPTREMOVE
                         printf("Removing %s because %c should appear exactly %d times and not %d (e=%d)\n", t->key, chars->c, f[i].exactApp, chars->app, e);
@@ -541,7 +547,7 @@ void excludeOthers(tree t, Filter *f) {
                         return;
                     } else if (f[i].exactApp == -1 && chars->app < f[i].minApp) {
                         // It should appear at least f[i].minApp times but it doesn't
-                        t->used = 1;
+                        t->used = match;
                         e--;
 #ifdef PROMPTREMOVE
                         printf("Removing %s because %c should appear at least %d times but it appears %d (e=%d)\n", t->key, chars->c, f[i].minApp, chars->app, e);
@@ -556,7 +562,7 @@ void excludeOthers(tree t, Filter *f) {
                             if (appear != NULL) {
                                 if (appear->n == list->n && !list->f) {
                                     // It appear in a forbidden position
-                                    t->used = 1;
+                                    t->used = match;
                                     e--;
 #ifdef PROMPTREMOVE
                                     printf("Removing %s because %c apprear in position %d but it shouldn't (e=%d)\n", t->key, chars->c, list->n, e);
@@ -564,7 +570,7 @@ void excludeOthers(tree t, Filter *f) {
                                     return;
                                 } else if (appear->n != list->n && list->f) {
                                     // It doesn't appear in a mandatory position
-                                    t->used = 1;
+                                    t->used = match;
                                     e--;
 #ifdef PROMPTREMOVE
                                     printf("Removing %s because %c does not appear in position %d but it should a (e=%d)\n", t->key, chars->c, list->n, e);
@@ -573,22 +579,22 @@ void excludeOthers(tree t, Filter *f) {
                                 }
                             } else if (list->f) {
                                 // It doesn't appear in a mandatory position
-                                t->used = 1;
+                                t->used = match;
                                 e--;
 #ifdef PROMPTREMOVE
                                 printf("Removing %s because %c does not appear in position %d but it should b (e=%d)\n", t->key, chars->c, list->n, e);
 #endif
                                 return;
                             }
-                        }else if (list->f) {
-                                // It doesn't appear in a mandatory position
-                                t->used = 1;
-                                e--;
+                        } else if (list->f) {
+                            // It doesn't appear in a mandatory position
+                            t->used = match;
+                            e--;
 #ifdef PROMPTREMOVE
-                                printf("Removing %s because %c does not appear in position %d but it should c (e=%d)\n", t->key, chars->c, list->n, e);
+                            printf("Removing %s because %c does not appear in position %d but it should c (e=%d)\n", t->key, chars->c, list->n, e);
 #endif
-                                return;
-                            }
+                            return;
+                        }
                     }
                     i--;
                 }
@@ -596,7 +602,7 @@ void excludeOthers(tree t, Filter *f) {
             while (i >= 0) {
                 if (f[i].memb == 0) {
                     // There is a char < any char in t->key that should appear but doesn't
-                    t->used = 1;
+                    t->used = match;
                     e--;
 #ifdef PROMPTREMOVE
                     printf("Removing %s because %c does not appear but it should, < (e=%d)\n", t->key, hm1(i), e);
@@ -620,7 +626,7 @@ void freeCharFilter(CharFilter head) {
         freeCharFilter(head->next);
         freeList(head->pos);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("debug/tree.txt", "a");
+        FILE *f = fopen("../debug/tree.txt", "a");
         fprintf(f, "\tFreeing %c\n", head->c);
         fclose(f);
 #endif
@@ -632,7 +638,7 @@ void freeTree(tree root) {
         freeTree(root->left);
         freeTree(root->right);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("debug/tree.txt", "a");
+        FILE *f = fopen("../debug/tree.txt", "a");
         fprintf(f, "\nFreeing %s\n", root->key);
         fclose(f);
 #endif
@@ -655,7 +661,7 @@ void play(int max, char *ref, tree *elig) {
     Filter alphabet[64];  // Array of filters, one for each character
 
 #ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("debug/alphabet.txt", "w");
+    FILE *fpalphabet = fopen("../debug/alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
     // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
@@ -722,8 +728,8 @@ void play(int max, char *ref, tree *elig) {
                     printf("not_exists\n");
                 } else {
                     counter = 0;
-                    if (!node->used) {
-                        node->used = 1;
+                    if (node->used < match) {
+                        node->used = match;
                         e--;
                     }
 
@@ -856,7 +862,7 @@ void play(int max, char *ref, tree *elig) {
 
 int main(int argc, char const *argv[]) {
 #ifdef PROMPTTREE
-    FILE *aaa = fopen("debug/tree.txt", "w");
+    FILE *aaa = fopen("../debug/tree.txt", "w");
     fprintf(aaa, "Tree:\n");
     fclose(aaa);
 #endif
@@ -877,7 +883,9 @@ int main(int argc, char const *argv[]) {
                 // +nuova_partita
                 if (fgets(ref, k + 1, stdin) == NULL) break;
                 if (scanf("%d\n", &max) == EOF) break;
-                reset_used(eligibiles);
+                // reset_used(eligibiles);
+                e = emax;
+                match++;
                 play(max, ref, &eligibiles);
                 break;
             case 'i':

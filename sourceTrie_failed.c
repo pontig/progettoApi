@@ -51,11 +51,13 @@ typedef struct tree_node {
     struct tree_node *left;
     struct tree_node *right;
     struct tree_node *parent;
+    struct tree_node *nextChar;
     rb_color color;
-    char *key;
-    char *ordered;
+    int depth;
+    char key;
+    // char *ordered;
     int used;
-    CharFilter chars;
+    // CharFilter chars;
 } tree_node;
 typedef tree_node *tree;
 
@@ -190,29 +192,67 @@ void right_rotate(tree *root, tree_node *y) {
     return;
 }
 
+void freeList(List head) {
+    if (head != NULL) {
+        free(head->next);
+        free(head);
+    }
+}
+void printList(List l) {
+    if (l != NULL) {
+        printf("%c", l->n);
+        printList(l->next);
+    } else
+        printf("\n");
+}
+// Tree minimum
+tree_node *tree_minimum(tree x) {
+    while (x->left != NULL) {
+        x = x->left;
+    }
+    return x;
+}
+tree_node *tree_successor(tree_node *x) {
+    if (x->right != NULL) {
+        return tree_minimum(x->right);
+    }
+    tree_node *y = x->parent;
+    while (y != NULL && x == y->right) {
+        x = y;
+        y = y->parent;
+    }
+    return y;
+}
+
 // Inorder tree walk
 void inorder(tree t) {
     if (t != NULL) {
         inorder(t->left);
-        if (!t->used) {
-            printf("%s\n", t->key);
-        }
+        printf("%c", t->key);
+        if(t->depth == k-1) printf("\n");
+        inorder(t->nextChar);
         inorder(t->right);
     }
 }
 
 // Tree search
-tree_node *rb_search(tree t, char *key) {
+tree_node *rb_search(tree t, char c) {
     while (t != NULL) {
-        if (strcmp(key, t->key) < 0) {
+        if (c < t->key) {
             t = t->left;
-        } else if (strcmp(key, t->key) > 0) {
+        } else if (c > t->key) {
             t = t->right;
         } else {
             return t;
         }
     }
     return NULL;
+}
+int word_search(tree t, char *key) {
+    if (key != NULL)
+        return rb_search(t, key[0]) != NULL && word_search(t->nextChar, key + 1);
+    else
+        return 1;
 }
 
 // Reset all used flags to 0
@@ -369,87 +409,102 @@ void rb_insert_fixup(tree *t, tree_node *z) {
         }
     }
 }
-void rb_insert(tree *t, char *key) {
-    tree_node *y = NULL;
-    tree_node *x = *t;
-    tree_node *z = (tree)malloc(sizeof(tree_node));
-    Word ord;
-    ord.pos = (int *)malloc(sizeof(int) * (k + 1));
-    ord.w = (char *)malloc(sizeof(char) * (k + 1));
-    for (int i = 0; i < k; i++) {
-        ord.pos[i] = i;
-        ord.w[i] = key[i];
-    }
-    ord.w[k] = '\0';
-    heap_sort(&ord, k);
-    z->ordered = (char *)malloc(sizeof(char) * (k + 1));
-    strcpy(z->ordered, ord.w);
-    z->chars = NULL;
-    int a = 0;  // Number of appearances
-    List l = NULL;
-    for (int i = 0; i <= k; i++) {
-        if ((i != 0 && ord.w[i] != ord.w[i - 1]) || i == k) {
-            // New char
-            Record *new = (Record *)malloc(sizeof(Record));
-            new->c = ord.w[i - 1];
-            new->app = a;
-            new->pos = l;
-            head_insert(&(z->chars), new);
-
-            l = NULL;
-            a = 0;
-        }
-        if (i != k) {
-            a++;
-            order_insert(&l, ord.pos[i]);
-        }
-    }
-
-    free(ord.w);
-    free(ord.pos);
-    z->key = key;
-    z->used = 0;
-    e++;
+void rba_insert(tree *t, char *key, int pos) {
+    if (pos < k) {
+        tree_node *ch = rb_search(*t, key[0]);
+        if (ch == NULL) {
+            tree_node *y = NULL;
+            tree_node *x = *t;
+            tree_node *z = (tree)malloc(sizeof(tree_node));
+            // Word ord;
+            // ord.pos = (int *)malloc(sizeof(int) * (k + 1));
+            // ord.w = (char *)malloc(sizeof(char) * (k + 1));
+            // for (int i = 0; i < k; i++) {
+            //     ord.pos[i] = i;
+            //     ord.w[i] = key[i];
+            // }
+            // ord.w[k] = '\0';
+            // heap_sort(&ord, k);
+            // z->ordered = (char *)malloc(sizeof(char) * (k + 1));
+            // strcpy(z->ordered, ord.w);
+            // z->chars = NULL;
+            // int a = 0;  // Number of appearances
+            // List l = NULL;
+            // for (int i = 0; i <= k; i++) {
+            //     if ((i != 0 && ord.w[i] != ord.w[i - 1]) || i == k) {
+            //         // New char
+            //         Record *new = (Record *)malloc(sizeof(Record));
+            //         new->c = ord.w[i - 1];
+            //         new->app = a;
+            //         new->pos = l;
+            //         head_insert(&(z->chars), new);
+            //
+            //        l = NULL;
+            //        a = 0;
+            //    }
+            //    if (i != k) {
+            //        a++;
+            //        order_insert(&l, ord.pos[i]);
+            //    }
+            //}
+            //
+            // free(ord.w);
+            // free(ord.pos);
+            z->key = key[0];
+            z->used = 0;
+            z->depth = pos;
+            e++;
 #ifdef PROMPTREMOVE
-    // printf("Inserting %s (e=%d)\n", key, e);
+            // printf("Inserting %s (e=%d)\n", key, e);
 #endif
-    z->left = NULL;
-    z->right = NULL;
-    z->color = RED;
-    while (x != NULL) {
-        y = x;
-        if (strcmp(z->key, x->key) < 0) {
-            x = x->left;
-        } else {
-            x = x->right;
-        }
-    }
-    z->parent = y;
-    if (y == NULL) {
-        *t = z;
-    } else if (strcmp(z->key, y->key) < 0) {
-        y->left = z;
-    } else {
-        y->right = z;
-    }
-    rb_insert_fixup(t, z);
+            z->left = NULL;
+            z->right = NULL;
+            z->color = RED;
+            while (x != NULL) {
+                y = x;
+                if (z->key < x->key) {
+                    x = x->left;
+                } else {
+                    x = x->right;
+                }
+            }
+            z->parent = y;
+            if (y == NULL) {
+                *t = z;
+            } else if (z->key < y->key) {
+                y->left = z;
+            } else {
+                y->right = z;
+            }
+            rb_insert_fixup(t, z);
+            rba_insert(&(z->nextChar), key + 1, pos + 1);
+        } else
+            rba_insert(&(ch->nextChar), key + 1, pos + 1);
 
 #ifdef PROMPTTREE
-    FILE *fptree = fopen("../debug/tree.txt", "a");
-    fprintf(fptree, "Parola %s (%d):\n", key, e);
-    fprintf(fptree, "Colore: %s\n", z->color == RED ? "RED" : "BLACK");
-    fprintf(fptree, "ordinata: %s\n", z->ordered);
-    fprintf(fptree, "Chiavi:\n");
-    for (CharFilter c = z->chars; c != NULL; c = c->next) {
-        fprintf(fptree, "\t-%c apparsa nelle posizioni ", c->c);
-        for (List l = c->pos; l != NULL; l = l->next) {
-            fprintf(fptree, "%d, ", l->n);
+        FILE *fptree = fopen("debug/tree.txt", "a");
+        fprintf(fptree, "Parola %s (%d):\n", key, e);
+        fprintf(fptree, "Colore: %s\n", z->color == RED ? "RED" : "BLACK");
+        fprintf(fptree, "ordinata: %s\n", z->ordered);
+        fprintf(fptree, "Chiavi:\n");
+        for (CharFilter c = z->chars; c != NULL; c = c->next) {
+            fprintf(fptree, "\t-%c apparsa nelle posizioni ", c->c);
+            for (List l = c->pos; l != NULL; l = l->next) {
+                fprintf(fptree, "%d, ", l->n);
+            }
+            fprintf(fptree, "\n");
         }
         fprintf(fptree, "\n");
-    }
-    fprintf(fptree, "\n");
-    fclose(fptree);
+        fclose(fptree);
 #endif
+    } else {
+        e++;
+        return;
+    }
+}
+void rb_insert(tree *t, char *key) {
+    rba_insert(t, key, 0);
+    return;
 }
 
 // Return the position of the filter characters
@@ -498,10 +553,14 @@ void fillEligibles(tree *t) {
     } while (1);
 }
 
-void excludeOthers(tree t, Filter *f) {
+void checkOthers(tree t, Filter *f) {
+    return;
+}
+
+/*void checkOthers(tree t, Filter *f) {
     if (t != NULL) {
-        excludeOthers(t->left, f);
-        excludeOthers(t->right, f);
+        checkOthers(t->left, f);
+        checkOthers(t->right, f);
 
         if (!t->used) {
             int i = 63;
@@ -607,20 +666,15 @@ void excludeOthers(tree t, Filter *f) {
             }
         }
     }
-}
+}*/
+
 // Hope this is enough to prevent memory leaks
-void freeList(List head) {
-    if (head != NULL) {
-        free(head->next);
-        free(head);
-    }
-}
 void freeCharFilter(CharFilter head) {
     if (head != NULL) {
         freeCharFilter(head->next);
         freeList(head->pos);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("../debug/tree.txt", "a");
+        FILE *f = fopen("debug/tree.txt", "a");
         fprintf(f, "\tFreeing %c\n", head->c);
         fclose(f);
 #endif
@@ -632,19 +686,19 @@ void freeTree(tree root) {
         freeTree(root->left);
         freeTree(root->right);
 #ifdef PROMPTTREEE
-        FILE *f = fopen("../debug/tree.txt", "a");
+        FILE *f = fopen("debug/tree.txt", "a");
         fprintf(f, "\nFreeing %s\n", root->key);
         fclose(f);
 #endif
-        free(root->key);
-        free(root->ordered);
-        freeCharFilter(root->chars);
+        // free(root->key);
+        // free(root->ordered);
+        // freeCharFilter(root->chars);
         free(root);
     }
 }
 void freeAlphabet(Positions *l) {
     if (*l != NULL) {
-        freeAlphabet(&((*l)->next));
+        // freeAlphabet(&((*l)->next));
         free(*l);
     }
 }
@@ -655,7 +709,7 @@ void play(int max, char *ref, tree *elig) {
     Filter alphabet[64];  // Array of filters, one for each character
 
 #ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("../debug/alphabet.txt", "w");
+    FILE *fpalphabet = fopen("debug/alphabet.txt", "w");
     fprintf(fpalphabet, "NUOVA PARTITA\n\n");
     // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
 #endif
@@ -684,7 +738,7 @@ void play(int max, char *ref, tree *elig) {
                     ignoreLine();
                     fillEligibles(elig);
                     ignoreLine();
-                    excludeOthers(*elig, alphabet);
+                    checkOthers(*elig, alphabet);
                 } else if (c == 's') {
                     // +stampa_filtrate
                     ignoreLine();
@@ -716,16 +770,16 @@ void play(int max, char *ref, tree *elig) {
                 ordWord.w[k] = '\0';
                 getchar();
 
-                tree_node *node = rb_search(*elig, unWord);
+                int isEligible = word_search(*elig, unWord);
 
-                if (node == NULL) {
+                if (isEligible) {
                     printf("not_exists\n");
                 } else {
                     counter = 0;
-                    if (!node->used) {
-                        node->used = 1;
-                        e--;
-                    }
+                    // if (!node->used) {
+                    //     node->used = 1;
+                    //     e--;
+                    // }
 
                     attempts++;
 
@@ -806,7 +860,7 @@ void play(int max, char *ref, tree *elig) {
                             }
                         } while (hw < k && hr < k && orderRef[hr] != '~' && ordWord.w[hw] != '~');
                         printf("%s\n", output);
-                        excludeOthers(*elig, alphabet);
+                        checkOthers(*elig, alphabet);
                         printf("%d\n", e);
                     }
 
@@ -856,7 +910,7 @@ void play(int max, char *ref, tree *elig) {
 
 int main(int argc, char const *argv[]) {
 #ifdef PROMPTTREE
-    FILE *aaa = fopen("../debug/tree.txt", "w");
+    FILE *aaa = fopen("debug/tree.txt", "w");
     fprintf(aaa, "Tree:\n");
     fclose(aaa);
 #endif

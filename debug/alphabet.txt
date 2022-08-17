@@ -1,25 +1,7 @@
 NUOVA PARTITA
 
-Dopo la lettura della parola laj74 abbiamo appreso che:
-Character 4:
-    not member
-
-
-
-Character 7:
-    not member
-
-
-
-Character a:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 1, 
-
-
-Character j:
+Dopo la lettura della parola vlplX abbiamo appreso che:
+Character X:
     not member
 
 
@@ -29,41 +11,45 @@ Character l:
 
 
 
-Dopo la lettura della parola sm_ks abbiamo appreso che:
-Character 4:
+Character p:
     not member
 
 
 
-Character 7:
+Character v:
     not member
 
 
 
-Character _:
+Dopo la lettura della parola PcG3Y abbiamo appreso che:
+Character 3:
     not member
 
 
 
-Character a:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 1, 
-
-
-Character j:
+Character G:
     not member
 
 
 
-Character k:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 
-Forb: 3, 
+Character P:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character c:
+    not member
+
 
 
 Character l:
@@ -71,28 +57,205 @@ Character l:
 
 
 
-Character m:
+Character p:
     not member
 
 
 
-Character s:
+Character v:
     not member
 
 
 
-Dopo la lettura della parola okauE abbiamo appreso che:
+Dopo la lettura della parola 9WGb4 abbiamo appreso che:
+Character 3:
+    not member
+
+
+
 Character 4:
     not member
 
 
 
-Character 7:
+Character 9:
     not member
 
 
 
-Character E:
+Character G:
+    not member
+
+
+
+Character P:
+    not member
+
+
+
+Character W:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character b:
+    not member
+
+
+
+Character c:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Character p:
+    not member
+
+
+
+Character v:
+    not member
+
+
+
+Dopo la lettura della parola 1ho8M abbiamo appreso che:
+Character 1:
+    not member
+
+
+
+Character 3:
+    not member
+
+
+
+Character 4:
+    not member
+
+
+
+Character 8:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character G:
+    not member
+
+
+
+Character M:
+    not member
+
+
+
+Character P:
+    not member
+
+
+
+Character W:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character b:
+    not member
+
+
+
+Character c:
+    not member
+
+
+
+Character h:
+    not member
+
+
+
+Character l:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character p:
+    not member
+
+
+
+Character v:
+    not member
+
+
+
+Dopo la lettura della parola em13J abbiamo appreso che:
+Character 1:
+    not member
+
+
+
+Character 3:
+    not member
+
+
+
+Character 4:
+    not member
+
+
+
+Character 8:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character G:
+    not member
+
+
+
+Character J:
 Member: 0
 MinApp: 1
 ExactApp: -1
@@ -100,30 +263,49 @@ Cert: 4,
 Forb: 
 
 
-Character _:
+Character M:
     not member
 
 
 
-Character a:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 2, 
-Forb: 1, 
-
-
-Character j:
+Character P:
     not member
 
 
 
-Character k:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 1, 
-Forb: 3, 
+Character W:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character b:
+    not member
+
+
+
+Character c:
+    not member
+
+
+
+Character e:
+    not member
+
+
+
+Character h:
+    not member
+
 
 
 Character l:
@@ -137,23 +319,271 @@ Character m:
 
 
 Character o:
-Member: 0
-MinApp: 1
-ExactApp: -1
-Cert: 0, 
-Forb: 
-
-
-Character s:
     not member
 
 
 
-Character u:
+Character p:
+    not member
+
+
+
+Character v:
+    not member
+
+
+
+Dopo la lettura della parola Peii6 abbiamo appreso che:
+Character 1:
+    not member
+
+
+
+Character 3:
+    not member
+
+
+
+Character 4:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character 8:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character G:
+    not member
+
+
+
+Character J:
 Member: 0
 MinApp: 1
 ExactApp: -1
-Cert: 3, 
+Cert: 4, 
 Forb: 
+
+
+Character M:
+    not member
+
+
+
+Character P:
+    not member
+
+
+
+Character W:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character b:
+    not member
+
+
+
+Character c:
+    not member
+
+
+
+Character e:
+    not member
+
+
+
+Character h:
+    not member
+
+
+
+Character i:
+Member: 0
+MinApp: 1
+ExactApp: 1
+Cert: 3, 
+Forb: 2, 
+
+
+Character l:
+    not member
+
+
+
+Character m:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character p:
+    not member
+
+
+
+Character v:
+    not member
+
+
+
+Dopo la lettura della parola BSMiB abbiamo appreso che:
+Character 1:
+    not member
+
+
+
+Character 3:
+    not member
+
+
+
+Character 4:
+    not member
+
+
+
+Character 6:
+    not member
+
+
+
+Character 8:
+    not member
+
+
+
+Character 9:
+    not member
+
+
+
+Character B:
+    not member
+
+
+
+Character G:
+    not member
+
+
+
+Character J:
+Member: 0
+MinApp: 1
+ExactApp: -1
+Cert: 4, 
+Forb: 
+
+
+Character M:
+    not member
+
+
+
+Character P:
+    not member
+
+
+
+Character S:
+    not member
+
+
+
+Character W:
+    not member
+
+
+
+Character X:
+    not member
+
+
+
+Character Y:
+    not member
+
+
+
+Character b:
+    not member
+
+
+
+Character c:
+    not member
+
+
+
+Character e:
+    not member
+
+
+
+Character h:
+    not member
+
+
+
+Character i:
+Member: 0
+MinApp: 1
+ExactApp: 1
+Cert: 3, 
+Forb: 2, 
+
+
+Character l:
+    not member
+
+
+
+Character m:
+    not member
+
+
+
+Character o:
+    not member
+
+
+
+Character p:
+    not member
+
+
+
+Character v:
+    not member
+
 
 
