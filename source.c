@@ -4,11 +4,8 @@
 
 //#define PROMPTALPH
 //#define PROMPTREMOVE
-//#define PROMPTTREE
-//#define MINA
-//#define PROMPTSORT
 
-// Typedef for a linked list node
+// bkcn<kbjadbjcanj nad for a linked list node
 typedef struct EL {
     int n;
     struct EL *next;
@@ -23,14 +20,17 @@ typedef struct FM {
 typedef Track *Positions;
 
 typedef struct E {
+    char c;         // The character itself
     int memb;       // If the char is NOT a member of ref
     Positions pos;  // Mandatory and Forbidden positions
     int minApp;     // Minimum number of appearances
     int exactApp;   // Exact number of appearances
     struct E *left;
     struct E *right;
+    struct E *parent;
 } Filter;
-typedef Filter * Alph;
+typedef Filter *Alph;
+
 typedef struct CH {
     char c;    // The char
     int app;   // How many times it appears
@@ -38,6 +38,20 @@ typedef struct CH {
     struct CH *next;
 } Record;
 typedef Record *CharFilter;
+
+typedef struct T {
+    char c;     // The char
+    int type;   /* Type of the information:
+                0 - membership
+                1 - mandatory pposition
+                2 - forbidden position
+                3 - minimum number of appearances
+                4 - exact number of appearances
+                */
+    int value;  // Value of the information
+    struct T *next;
+} Three;
+typedef Three *Check;
 
 // Typedef to assign \, |
 typedef struct {
@@ -58,7 +72,7 @@ typedef struct tree_node {
     char *key;
     char *ordered;
     int used;
-    CharFilter chars;
+    // CharFilter chars;
 } tree_node;
 typedef tree_node *tree;
 
@@ -99,7 +113,10 @@ void order_insert(List *l, int n) {
         }
     }
 }
-void pos_insert(Positions *l, int n, int flag) {
+// Insert a new node in the Position list ordered whthout duplicates
+// Flag 1 for mandatory, 0 for forbidden
+// Return 1 if it is a new node, 0 if it is a duplicate
+int pos_insert(Positions *l, int n, int flag) {
     Track *new = (Track *)malloc(sizeof(Track));
     new->n = n;
     new->f = flag;
@@ -111,15 +128,15 @@ void pos_insert(Positions *l, int n, int flag) {
         if (aux->n > n) {
             new->next = aux;
             *l = new;
-            return;
+            return 1;
         } else if (aux->n == n) {
             free(new);
-            return;
+            return 0;
         }
         while (aux->next != NULL && aux->next->n < n) {
             if (aux->n == n || aux->next->n == n) {
                 free(new);
-                return;
+                return 0;
             }
             aux = aux->next;
         }
@@ -130,6 +147,7 @@ void pos_insert(Positions *l, int n, int flag) {
             aux->next = new;
         }
     }
+    return 1;
 }
 
 // Head insert a new node in the list, type void
@@ -155,6 +173,20 @@ void h_ins(List *l, int n) {
         *l = new;
     }
     return;
+}
+void new_info_insert(Check *l, char c, int type, int value) {
+    // Insert a new node in the head of the list
+    Three *new = (Three *)malloc(sizeof(Three));
+    new->c = c;
+    new->type = type;
+    new->value = value;
+    new->next = NULL;
+    if (*l == NULL) {
+        *l = new;
+    } else {
+        new->next = (*l);
+        *l = new;
+    }
 }
 
 // Red-black tree rotations
@@ -389,29 +421,8 @@ void rb_insert(tree *t, char *key) {
     heap_sort(&ord, k);
     z->ordered = (char *)malloc(sizeof(char) * (k + 1));
     strcpy(z->ordered, ord.w);
-    z->chars = NULL;
-    int a = 0;  // Number of appearances
-    List l = NULL;
-    for (int i = 0; i <= k; i++) {
-        if ((i != 0 && ord.w[i] != ord.w[i - 1]) || i == k) {
-            // New char
-            Record *new = (Record *)malloc(sizeof(Record));
-            new->c = ord.w[i - 1];
-            new->app = a;
-            new->pos = l;
-            head_insert(&(z->chars), new);
-
-            l = NULL;
-            a = 0;
-        }
-        if (i != k) {
-            a++;
-            order_insert(&l, ord.pos[i]);
-        }
-    }
-
-    free(ord.w);
     free(ord.pos);
+    free(ord.w);
     z->key = key;
     z->used = 0;
     e++;
@@ -439,23 +450,64 @@ void rb_insert(tree *t, char *key) {
         y->right = z;
     }
     rb_insert_fixup(t, z);
+}
 
-#ifdef PROMPTTREE
-    FILE *fptree = fopen("../debug/tree.txt", "a");
-    fprintf(fptree, "Parola %s (%d):\n", key, e);
-    fprintf(fptree, "Colore: %s\n", z->color == RED ? "RED" : "BLACK");
-    fprintf(fptree, "ordinata: %s\n", z->ordered);
-    fprintf(fptree, "Chiavi:\n");
-    for (CharFilter c = z->chars; c != NULL; c = c->next) {
-        fprintf(fptree, "\t-%c apparsa nelle posizioni ", c->c);
-        for (List l = c->pos; l != NULL; l = l->next) {
-            fprintf(fptree, "%d, ", l->n);
+// BST Alph
+void bst_insert(Alph *a, Filter *z) {
+    Filter *y = NULL;
+    Filter *x = *a;
+    while (x != NULL) {
+        y = x;
+        if (z->c < x->c) {
+            x = x->left;
+        } else {
+            x = x->right;
         }
-        fprintf(fptree, "\n");
     }
-    fprintf(fptree, "\n");
-    fclose(fptree);
-#endif
+    z->parent = y;
+    if (y == NULL) {
+        *a = z;
+    } else if (z->c < y->c) {
+        y->left = z;
+    } else {
+        y->right = z;
+    }
+
+    z->left = NULL;
+    z->right = NULL;
+    return;
+}
+Filter *bst_search(Alph *a, char c) {
+    Filter *x = *a;
+    while (x != NULL) {
+        if (c < x->c) {
+            x = x->left;
+        } else if (c > x->c) {
+            x = x->right;
+        } else {
+            return x;
+        }
+    }
+    return NULL;
+}
+Filter *bst_minimum(Alph a) {
+    Filter *x = a;
+    while (x->left != NULL) {
+        x = x->left;
+    }
+    return x;
+}
+Filter *bst_successor(Alph a) {
+    Filter *x = a;
+    if (x->right != NULL) {
+        return bst_minimum(x->right);
+    }
+    Filter *y = x->parent;
+    while (y != NULL && x == y->right) {
+        x = y;
+        y = y->parent;
+    }
+    return y;
 }
 
 // Return the position of the filter characters
@@ -482,14 +534,20 @@ void ignoreLine() {
     size_t len = 0;
     if (getline(&line, &len, stdin) == -1) return;
 #ifdef PROMPTREMOVE
-    printf("%s", line);
+    printf("--%s", line);
 #endif
     free(line);
     return;
 }
 
-void fillEligibles(tree *t) {
+void exclude(tree_node *t) {
+    e--;
+    t->used = match;
+    return;
+}
+void fillEligibles(tree *t, Alph f) {
     do {
+    next:;
         char *i = (char *)malloc(sizeof(char) * (k + 1));
         char c = getchar();
         ungetc(c, stdin);
@@ -497,6 +555,64 @@ void fillEligibles(tree *t) {
             if (fgets(i, k + 1, stdin) == NULL) break;
             getchar();
             rb_insert(t, i);
+            if (f != NULL) {
+                // We need to check the filter for i
+                int app[64] = {0};
+                for (int j = 0; j < k; j++) app[h(i[j])]++;
+                for (Filter *j = bst_minimum(f); j != NULL; j = bst_successor(j)) {
+                    if (j->memb == 1 && app[h(j->c)] != 0) {
+                        // The char appears but it should not
+                        exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                        printf("Removing %s because the char %c appears but it should not\n", i, j->c);
+#endif
+                        goto next;
+                    } else if (j->memb == 0) {
+                        if (app[h(j->c)] == 0) {
+                            // The char does not appear but it should
+                            exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because the char %c does not appear but it should\n", i, j->c);
+#endif
+                            goto next;
+                        }
+                        if (j->exactApp != -1 && app[h(j->c)] != j->exactApp) {
+                            // The char does not appear the exact number of times it should
+                            exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because the char %c does not appear the exactly %d times but %d\n", i, j->c, j->exactApp, app[h(j->c)]);
+#endif
+                            goto next;
+                        } else if (j->exactApp == -1 && app[h(j->c)] < j->minApp) {
+                            // The char does not appear the minimum number of times it should
+                            exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because the char %c does not appear at least %d times but %d\n", i, j->c, j->minApp, app[h(j->c)]);
+#endif
+                            goto next;
+                        }
+                        for (Positions aux = j->pos; aux != NULL; aux = aux->next) {
+                            if (aux->f == 0 && i[aux->n] == j->c) {
+                                // The char appear in a forbidden position
+                                exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                                printf("Removing %s because the char %c appears in the forbidden position %d\n", i, j->c, aux->n);
+#endif
+                                goto next;
+                            }
+                            if (aux->f == 1 && i[aux->n] != j->c) {
+                                // The char does not appear in an mandatory position
+                                exclude(rb_search(*t, i));
+#ifdef PROMPTREMOVE
+                                printf("Removing %s because the char %c does not appear in the mandatory position %d\n", i, j->c, aux->n);
+#endif
+                                goto next;
+                            }
+                        }
+                    }
+                }
+            }
+
         } else {
             free(i);
             return;
@@ -504,116 +620,83 @@ void fillEligibles(tree *t) {
     } while (1);
 }
 
-void excludeOthers(tree t, Filter *f) {
+void excludeOthers(tree t, Check f) {
     if (t != NULL) {
         excludeOthers(t->left, f);
         excludeOthers(t->right, f);
-
         if (t->used < match) {
-            int i = 63;
-            for (CharFilter chars = t->chars; chars != NULL; chars = chars->next) {
-                int hh = h(chars->c);
-                while (i >= 0 && hh != i) {
-                    if (f[i].memb == 0) {
-                        // There is a char > chars->c that should appear but it doesn't
-                        t->used = match;
-                        e--;
+            char app[64] = {0};
+            for (int i = 0; i < k; i++) app[h(t->key[i])]++;
+            for (Check i = f; i != NULL; i = i->next) {
+                switch (i->type) {
+                    case 0:
+                        if (i->value == 1 && app[h(i->c)] != 0) {
+                            // The char is present in the word but it should not be
+                            exclude(t);
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c does not appear but it should, > (e=%d)\n", t->key, hm1(i), e);
-#endif
-                        return;
-                    }
-                    i--;
-                }
-                if (f[i].memb == -1) continue;
-                if (f[i].memb == 1) {
-                    // chars->c should not appear
-                    t->used = match;
-                    e--;
-#ifdef PROMPTREMOVE
-                    printf("Removing %s because %c should not appear but it does (e=%d)\n", t->key, chars->c, e);
-#endif
-                    return;
-                }
-                if (f[i].memb == 0) {
-                    // Ok, chars->c should appear and it does
-                    if (f[i].exactApp != -1 && chars->app != f[i].exactApp) {
-                        // It should appear exactly f[i].exactApp times but it doesn't
-                        t->used = match;
-                        e--;
-#ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear exactly %d times and not %d (e=%d)\n", t->key, chars->c, f[i].exactApp, chars->app, e);
-#endif
-                        return;
-                    } else if (f[i].exactApp == -1 && chars->app < f[i].minApp) {
-                        // It should appear at least f[i].minApp times but it doesn't
-                        t->used = match;
-                        e--;
-#ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear at least %d times but it appears %d (e=%d)\n", t->key, chars->c, f[i].minApp, chars->app, e);
-#endif
-                        return;
-                    }
-
-                    List appear = chars->pos;  // Positions where it appear
-                    for (Positions list = f[i].pos; list != NULL; list = list->next) {
-                        if (appear != NULL) {
-                            while (appear != NULL && appear->n < list->n) appear = appear->next;
-                            if (appear != NULL) {
-                                if (appear->n == list->n && !list->f) {
-                                    // It appear in a forbidden position
-                                    t->used = match;
-                                    e--;
-#ifdef PROMPTREMOVE
-                                    printf("Removing %s because %c apprear in position %d but it shouldn't (e=%d)\n", t->key, chars->c, list->n, e);
-#endif
-                                    return;
-                                } else if (appear->n != list->n && list->f) {
-                                    // It doesn't appear in a mandatory position
-                                    t->used = match;
-                                    e--;
-#ifdef PROMPTREMOVE
-                                    printf("Removing %s because %c does not appear in position %d but it should a (e=%d)\n", t->key, chars->c, list->n, e);
-#endif
-                                    return;
-                                }
-                            } else if (list->f) {
-                                // It doesn't appear in a mandatory position
-                                t->used = match;
-                                e--;
-#ifdef PROMPTREMOVE
-                                printf("Removing %s because %c does not appear in position %d but it should b (e=%d)\n", t->key, chars->c, list->n, e);
-#endif
-                                return;
-                            }
-                        } else if (list->f) {
-                            // It doesn't appear in a mandatory position
-                            t->used = match;
-                            e--;
-#ifdef PROMPTREMOVE
-                            printf("Removing %s because %c does not appear in position %d but it should c (e=%d)\n", t->key, chars->c, list->n, e);
+                            printf("Removing %s because %c should not appear\n", t->key, i->c);
 #endif
                             return;
                         }
-                    }
-                    i--;
-                }
-            }
-            while (i >= 0) {
-                if (f[i].memb == 0) {
-                    // There is a char < any char in t->key that should appear but doesn't
-                    t->used = match;
-                    e--;
+                        if (i->value == 0 && app[h(i->c)] == 0) {
+                            // The char is not present in the word but it should be
+                            exclude(t);
 #ifdef PROMPTREMOVE
-                    printf("Removing %s because %c does not appear but it should, < (e=%d)\n", t->key, hm1(i), e);
+                            printf("Removing %s because %c should appear\n", t->key, i->c);
 #endif
-                    return;
+                            return;
+                        }
+                        break;
+                    case 1:
+                        if (t->key[i->value] != i->c) {
+                            // The char is not in a mandatory position
+                            exclude(t);
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because %c should be in position %d, instead there is %c\n", t->key, i->c, i->value, t->key[i->value]);
+#endif
+                            return;
+                        }
+                        break;
+                    case 2:
+                        if (t->key[i->value] == i->c) {
+                            // The char is in a forbidden position
+                            exclude(t);
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because %c should not be in position %d\n", t->key, i->c, i->value);
+#endif
+                            return;
+                        }
+                        break;
+                    case 3:
+                        if (app[h(i->c)] < i->value) {
+                            // The char does not appear enough times
+                            exclude(t);
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[h(i->c)]);
+#endif
+                            return;
+                        }
+                        break;
+                    case 4:
+                        if (app[h(i->c)] != i->value) {
+                            // The char does not appear the exact number of times
+                            exclude(t);
+#ifdef PROMPTREMOVE
+                            printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[h(i->c)]);
+#endif
+                            return;
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
-                i--;
             }
         }
+        return;
     }
 }
+
 // Hope this is enough to prevent memory leaks
 void freeList(List head) {
     if (head != NULL) {
@@ -625,11 +708,6 @@ void freeCharFilter(CharFilter head) {
     if (head != NULL) {
         freeCharFilter(head->next);
         freeList(head->pos);
-#ifdef PROMPTTREEE
-        FILE *f = fopen("../debug/tree.txt", "a");
-        fprintf(f, "\tFreeing %c\n", head->c);
-        fclose(f);
-#endif
         free(head);
     }
 }
@@ -637,42 +715,52 @@ void freeTree(tree root) {
     if (root != NULL) {
         freeTree(root->left);
         freeTree(root->right);
-#ifdef PROMPTTREEE
-        FILE *f = fopen("../debug/tree.txt", "a");
-        fprintf(f, "\nFreeing %s\n", root->key);
-        fclose(f);
-#endif
         free(root->key);
         free(root->ordered);
-        freeCharFilter(root->chars);
         free(root);
     }
 }
-void freeAlphabet(Positions *l) {
-    if (*l != NULL) {
-        freeAlphabet(&((*l)->next));
-        free(*l);
+void freePos(Positions l) {
+    if (l != NULL) {
+        freePos(l->next);
+        free(l);
+    }
+}
+
+void bst_inorder(Alph a) {
+    if (a != NULL) {
+        bst_inorder(a->left);
+        printf("%d ", a->c);
+        bst_inorder(a->right);
+    }
+}
+
+void freeAlphabet(Alph a) {
+    if (a != NULL) {
+        freeAlphabet(a->left);
+        freeAlphabet(a->right);
+        freePos(a->pos);
+        free(a);
+        return;
+    }
+}
+
+void freeCheck(Check c) {
+    if (c != NULL) {
+        freeCheck(c->next);
+        free(c);
     }
 }
 
 void play(int max, char *ref, tree *elig) {
-    int attempts = 0;     // Number of attempts done until now
-    int flag = 1;         // If the word must be compared or not
-    Filter alphabet[64];  // Array of filters, one for each character
-
+    int attempts = 0;      // Number of attempts done until now
+    int flag = 1;          // If the word must be compared or not
+    Alph alphabet = NULL;  // Tree of filters, one for each character
 #ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("../debug/alphabet.txt", "w");
-    fprintf(fpalphabet, "NUOVA PARTITA\n\n");
-    // printf("\n\n==============\nNUOVA PARTITA\n==============\n\n");
+    FILE *fpalphabet = fopen("debug/alphabet.txt", "a");
+    fprintf(fpalphabet, "\n\n==============\nPartita numero %d: ref %s\n==============\n\n", match, ref);
+    printf("\n\n==============\nPartita numero %d: ref %s\n==============\n\n", match, ref);
 #endif
-
-    // Set every minappears to 0
-    for (int i = 0; i < 64; i++) {
-        alphabet[i].minApp = 0;
-        alphabet[i].pos = NULL;
-        alphabet[i].exactApp = -1;
-        alphabet[i].memb = -1;
-    }
 
     do {
         if (attempts >= max) {
@@ -688,9 +776,8 @@ void play(int max, char *ref, tree *elig) {
                 if (c == 'i') {
                     // +inserisci_inizio
                     ignoreLine();
-                    fillEligibles(elig);
+                    fillEligibles(elig, alphabet);
                     ignoreLine();
-                    excludeOthers(*elig, alphabet);
                 } else if (c == 's') {
                     // +stampa_filtrate
                     ignoreLine();
@@ -698,14 +785,16 @@ void play(int max, char *ref, tree *elig) {
                 }
             } else {
                 // It is a word
+                Check newToCheck = NULL;                                  // New list of filters to check
                 char *orderRef = (char *)malloc(sizeof(char) * (k + 1));  // The reference word in the order of the alphabet
                 char *output = (char *)malloc(sizeof(char) * (k + 1));    // String of comparison
+                char *unWord = (char *)malloc(sizeof(char) * (k + 1));    // Input word unordered
+                Word ordWord;                                             // Input word ordered
+                int hw = 0;                                               // Head word
+                int hr = 0;                                               // Head reference
+                int counter;                                              // Number of characters found in the right place
+                int garbage;                                              // No one cares about this
                 output[k] = '\0';
-                char *unWord = (char *)malloc(sizeof(char) * (k + 1));  // Input word unordered
-                Word ordWord;                                           // Input word ordered
-                int hw = 0;                                             // Head word
-                int hr = 0;                                             // Head reference
-                int counter;                                            // Number of characters found in the right place
 
                 // Copy reference word in the order of the alphabet in orderRef
                 strcpy(orderRef, ref);
@@ -736,24 +825,36 @@ void play(int max, char *ref, tree *elig) {
                     attempts++;
 
                     // Update the filter
-                    char tempMinApps[64];  // Appearences of each char in this string
-                    for (int i = 0; i < 64; i++) {
-                        tempMinApps[i] = 0;
-                    }
+                    char tempMinApps[64] = {0};  // Appearences of each char in this string
 
                     for (int i = 0; i < k; i++) {
                         int tempCharPos = h(ordWord.w[i]);
                         if (ordWord.w[i] == orderRef[i]) {
+                            // Right character in the right place
                             counter++;
-                            alphabet[tempCharPos].memb = 0;
                             tempMinApps[tempCharPos]++;
-                            if (tempMinApps[tempCharPos] > alphabet[tempCharPos].minApp)
-                                alphabet[tempCharPos].minApp = tempMinApps[tempCharPos];
-                            pos_insert(&alphabet[tempCharPos].pos, ordWord.pos[i], 1);
-
-#ifdef MINA
-                            printf("Stringa %s: il carattere %c è apparso 'correttamente' %d volte, contro le %d che vi sono nel filtro\n", unWord, ordWord.w[i], alphabet[tempCharPos].minApp, alphabet[tempCharPos].minApp);
-#endif
+                            Filter *charInfo = bst_search(&alphabet, ordWord.w[i]);
+                            if (charInfo == NULL) {
+                                // We don't know anything about this char yet
+                                Filter *new = (Filter *)malloc(sizeof(Filter));
+                                new->c = ordWord.w[i];
+                                new->memb = 0;
+                                new->minApp = 1;
+                                new->exactApp = -1;
+                                new->pos = NULL;
+                                garbage = pos_insert(&new->pos, ordWord.pos[i], 1);
+                                bst_insert(&alphabet, new);
+                                new_info_insert(&newToCheck, orderRef[i], 1, i);
+                                new_info_insert(&newToCheck, ordWord.w[i], 3, 1);
+                            } else {
+                                // We have to check what we already know
+                                if (tempMinApps[tempCharPos] > charInfo->minApp) {
+                                    charInfo->minApp = tempMinApps[tempCharPos];
+                                    new_info_insert(&newToCheck, orderRef[i], 3, tempMinApps[tempCharPos]);
+                                }
+                                garbage = pos_insert(&charInfo->pos, ordWord.pos[i], 1);
+                                if (garbage) new_info_insert(&newToCheck, ordWord.w[i], 1, i);
+                            }
                             output[i] = '+';
                             ordWord.w[i] = '~';
                             orderRef[i] = '~';
@@ -766,37 +867,62 @@ void play(int max, char *ref, tree *elig) {
                         quick_sort(orderRef, 0, k - 1);
                         // qs_mod(&ordWord, 0, k - 1);
                         heap_sort(&ordWord, k);
-#ifdef PROMPTSORT
-                        for (int i = 0; i < k; i++) {
-                            printf("%c ", ordWord.w[i]);
-                            printf("%d\n", ordWord.pos[i]);
-                        }
-
-#endif
 
                         do {
                             // Filters for / , |
                             int tempCharPos = h(ordWord.w[hw]);
+                            Filter *charInfo = bst_search(&alphabet, ordWord.w[hw]);
+                            int isNull = charInfo == NULL ? 1 : 0;
                             if (orderRef[hr] == ordWord.w[hw]) {
-                                // Right caracter in the wrong position
+                                // Right character in the wrong position
                                 output[ordWord.pos[hw]] = '|';
-                                alphabet[tempCharPos].memb = 0;
                                 tempMinApps[tempCharPos]++;
 
-#ifdef MINA
-                                printf("Stringa %s: il carattere %c è apparso 'correttamente' %d volte, contro le %d che vi sono nel filtro\n", unWord, ordWord.w[hw], tempMinApps[tempCharPos], alphabet[tempCharPos].minApp);
-#endif
-                                if (tempMinApps[tempCharPos] > alphabet[tempCharPos].minApp)
-                                    alphabet[tempCharPos].minApp = tempMinApps[tempCharPos];
-                                pos_insert(&alphabet[tempCharPos].pos, ordWord.pos[hw], 0);
+                                if (isNull) {
+                                    // We don't know anything about this char yet
+                                    Filter *new = (Filter *)malloc(sizeof(Filter));
+                                    new->c = ordWord.w[hw];
+                                    new->memb = 0;
+                                    new->minApp = 1;
+                                    new->exactApp = -1;
+                                    new->pos = NULL;
+                                    garbage = pos_insert(&new->pos, ordWord.pos[hw], 0);
+                                    bst_insert(&alphabet, new);
+                                    new_info_insert(&newToCheck, ordWord.w[hw], 2, ordWord.pos[hw]);
+                                    new_info_insert(&newToCheck, ordWord.w[hw], 3, 1);
+                                } else {
+                                    // We have to check what we already know
+                                    if (tempMinApps[tempCharPos] > charInfo->minApp) {
+                                        charInfo->minApp = tempMinApps[tempCharPos];
+                                        new_info_insert(&newToCheck, orderRef[hr], 3, tempMinApps[tempCharPos]);
+                                    }
+                                    garbage = pos_insert(&charInfo->pos, ordWord.pos[hw], 0);
+                                    if (garbage) new_info_insert(&newToCheck, ordWord.w[hw], 2, ordWord.pos[hw]);
+                                }
                                 hr++;
                                 hw++;
                             } else if (orderRef[hr] > ordWord.w[hw]) {
-                                // Wrong character
+                                // Wrong character or character appeared too many times
                                 output[ordWord.pos[hw]] = '/';
-                                pos_insert(&alphabet[tempCharPos].pos, ordWord.pos[hw], 0);
-                                alphabet[tempCharPos].exactApp = alphabet[tempCharPos].minApp;
-                                if (alphabet[tempCharPos].minApp == 0) alphabet[tempCharPos].memb = 1;
+                                if (isNull) {
+                                    // Surely wrong character
+                                    Filter *new = (Filter *)malloc(sizeof(Filter));
+                                    new->c = ordWord.w[hw];
+                                    new->memb = 1;
+                                    new->pos = NULL;
+                                    new_info_insert(&newToCheck, ordWord.w[hw], 0, 1);
+                                    bst_insert(&alphabet, new);
+                                } else {
+                                    if (charInfo->memb == 1) {
+                                        // We already know this character shouldn't appear
+                                    } else {
+                                        // The character appeared too many times
+                                        garbage = pos_insert(&charInfo->pos, ordWord.pos[hw], 0);
+                                        if (garbage) new_info_insert(&newToCheck, ordWord.w[hw], 2, ordWord.pos[hw]);
+                                        charInfo->exactApp = charInfo->minApp;
+                                        new_info_insert(&newToCheck, ordWord.w[hw], 4, charInfo->exactApp);
+                                    }
+                                }
                                 hw++;
                             } else {
                                 hr++;
@@ -804,39 +930,78 @@ void play(int max, char *ref, tree *elig) {
                             if (hr == k || orderRef[hr] == '~') {
                                 // Remaining characters
                                 for (; hw < k && ordWord.w[hw] != '~'; hw++) {
+                                    Filter *charInfo = bst_search(&alphabet, ordWord.w[hw]);
                                     output[ordWord.pos[hw]] = '/';
-                                    pos_insert(&alphabet[h(ordWord.w[hw])].pos, ordWord.pos[hw], 0);
-                                    alphabet[h(ordWord.w[hw])].exactApp = alphabet[h(ordWord.w[hw])].minApp;
-                                    if (alphabet[h(ordWord.w[hw])].minApp == 0) alphabet[h(ordWord.w[hw])].memb = 1;
+                                    if (charInfo == NULL) {
+                                        Filter *new = (Filter *)malloc(sizeof(Filter));
+                                        new->c = ordWord.w[hw];
+                                        new->memb = 1;
+                                        new->pos = NULL;
+                                        new_info_insert(&newToCheck, ordWord.w[hw], 0, 1);
+                                        bst_insert(&alphabet, new);
+                                    } else {
+                                        if (charInfo->memb == 1) {
+                                            // We already know this character shouldn't appear
+                                        } else {
+                                            // The character appeared too many times
+                                            garbage = pos_insert(&charInfo->pos, ordWord.pos[hw], 0);
+                                            if (garbage) new_info_insert(&newToCheck, ordWord.w[hw], 2, ordWord.pos[hw]);
+                                            charInfo->exactApp = charInfo->minApp;
+                                            new_info_insert(&newToCheck, ordWord.w[hw], 4, charInfo->exactApp);
+                                        }
+                                    }
                                 }
                             }
                         } while (hw < k && hr < k && orderRef[hr] != '~' && ordWord.w[hw] != '~');
                         printf("%s\n", output);
-                        excludeOthers(*elig, alphabet);
+                        excludeOthers(*elig, newToCheck);
+#ifndef PROMPTALPH
+                        freeCheck(newToCheck);
+#endif
                         printf("%d\n", e);
                     }
 
 #ifdef PROMPTALPH
-                    fprintf(fpalphabet, "Dopo la lettura della parola %s abbiamo appreso che:\n", unWord);
-                    char a[64] = {'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-                    for (int i = 0; i < 64; i++) {
-                        if (alphabet[i].memb != -1) {
-                            fprintf(fpalphabet, "Character %c:\n", a[i]);
-                            if (alphabet[i].memb)
-                                fprintf(fpalphabet, "    not member\n");
-                            else {
-                                fprintf(fpalphabet, "Member: %d\n", alphabet[i].memb);
-                                fprintf(fpalphabet, "MinApp: %d\n", alphabet[i].minApp);
-                                fprintf(fpalphabet, "ExactApp: %d\n", alphabet[i].exactApp);
-                                fprintf(fpalphabet, "Cert: ");
-                                for (Positions j = alphabet[i].pos; j != NULL; j = j->next)
-                                    if (j->f) fprintf(fpalphabet, "%d, ", j->n);
-                                fprintf(fpalphabet, "\nForb: ");
-                                for (Positions j = alphabet[i].pos; j != NULL; j = j->next)
-                                    if (!j->f) fprintf(fpalphabet, "%d, ", j->n);
-                            }
-                            fprintf(fpalphabet, "\n\n\n");
+                    fprintf(fpalphabet, "Dopo la lettura della parola %s abbiamo le seguenti nuove info:\n", unWord);
+                    for (Three *temp = newToCheck; temp != NULL; temp = temp->next) {
+                        switch (temp->type) {
+                            case 0:
+                                if (temp->value)
+                                    fprintf(fpalphabet, "Il carattere %c non deve apparire\n", temp->c);
+                                else
+                                    fprintf(fpalphabet, "Il carattere %c deve apparire\n", temp->c);
+                                break;
+                            case 1:
+                                fprintf(fpalphabet, "Il carattere %c deve apparire in posizione %d\n", temp->c, temp->value);
+                                break;
+                            case 2:
+                                fprintf(fpalphabet, "Il carattere %c non deve apparire in posizione %d\n", temp->c, temp->value);
+                                break;
+                            case 3:
+                                fprintf(fpalphabet, "Il carattere %c appare almeno %d volte\n", temp->c, temp->value);
+                                break;
+                            case 4:
+                                fprintf(fpalphabet, "Il carattere %c appare esattamente %d volte\n", temp->c, temp->value);
+                                break;
+                            default:
+                                break;
                         }
+                    }
+                    freeCheck(newToCheck);
+                    fprintf(fpalphabet, "Per cui l'alfabeto completo risulta:\n");
+                    for (Filter *i = bst_minimum(alphabet); i != NULL; i = bst_successor(i)) {
+                        fprintf(fpalphabet, "Character %c:\n", i->c);
+                        if (i->memb) {
+                            fprintf(fpalphabet, "\tnot member\n");
+                        } else {
+                            fprintf(fpalphabet, "minApp: %d\n", i->minApp);
+                            fprintf(fpalphabet, "ExactApp: %d\n", i->exactApp);
+                            fprintf(fpalphabet, "Positions: ");
+                            for (Positions j = i->pos; j != NULL; j = j->next) {
+                                fprintf(fpalphabet, "%d%c, ", j->n, j->f ? 'M' : 'F');
+                            }
+                        }
+                        fprintf(fpalphabet, "\n\n\n");
                     }
 
 #endif
@@ -851,9 +1016,7 @@ void play(int max, char *ref, tree *elig) {
         }
     } while (flag);
     // Free dynamically allocated memory
-    for (int i = 0; i < 64; i++) {
-        freeAlphabet(&alphabet[i].pos);
-    }
+    freeAlphabet(alphabet);
 #ifdef PROMPTALPH
     fclose(fpalphabet);
 #endif
@@ -861,17 +1024,17 @@ void play(int max, char *ref, tree *elig) {
 }
 
 int main(int argc, char const *argv[]) {
-#ifdef PROMPTTREE
-    FILE *aaa = fopen("../debug/tree.txt", "w");
-    fprintf(aaa, "Tree:\n");
-    fclose(aaa);
-#endif
     tree eligibiles = NULL;
     if (scanf("%d\n", &k) == EOF) return -1;
     char *ref = (char *)malloc(sizeof(char) * (k + 1));  // Reference word
     int max;                                             // Maximum number of attempts allowed
 
-    fillEligibles(&eligibiles);
+    fillEligibles(&eligibiles, NULL);
+#ifdef PROMPTALPH
+    FILE *fpalphabet = fopen("debug/alphabet.txt", "w");
+    fprintf(fpalphabet, "Alphabet file\n");
+    fclose(fpalphabet);
+#endif
 
     char flag = getchar();
     while (flag != EOF && flag != '$') {
@@ -883,14 +1046,13 @@ int main(int argc, char const *argv[]) {
                 // +nuova_partita
                 if (fgets(ref, k + 1, stdin) == NULL) break;
                 if (scanf("%d\n", &max) == EOF) break;
-                // reset_used(eligibiles);
                 e = emax;
                 match++;
                 play(max, ref, &eligibiles);
                 break;
             case 'i':
                 // +inserisci_inizio
-                fillEligibles(&eligibiles);
+                fillEligibles(&eligibiles, NULL);
                 ignoreLine();
                 break;
             default:
@@ -903,3 +1065,13 @@ int main(int argc, char const *argv[]) {
     free(ref);
     return 0;
 }
+
+/*
+Quando faccio excludeOthers dopo aver letto una parola da input in play, mi basta analizzare solamente i filtri NUOVI appena
+acquisiti dalla parola in input, mentre invece devo scorrere tutto l'albero di Alph nel caso in cui io stia aggiungendo da
+fillEligibles.
+*/
+
+/*414 di output correct, parola */
+/*420 di output */
+/*AAmAN ultima parola comune*/

@@ -4,6 +4,7 @@
         "header.h": "c",
         "trees.h": "c",
         "stdlib.h": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "stdio.h": "c"
     }
 }
