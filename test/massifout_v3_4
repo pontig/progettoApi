@@ -1,0 +1,793 @@
+desc: --massif-out-file=test/massifout_v3_4
+cmd: ./a.out
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=54610103
+mem_heap_B=2704108
+mem_heap_extra_B=1300060
+mem_stacks_B=0
+heap_tree=detailed
+n3: 2704108 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2400000 0x10A0AF: rb_insert (source.c:411)
+  n1: 2400000 0x10A5C5: fillEligibles (source.c:556)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+ n1: 300006 0x10A546: fillEligibles (source.c:550)
+  n0: 300006 0x10BE6E: main (source.c:1037)
+ n0: 4102 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=2
+#-----------
+time=111465134
+mem_heap_B=3231866
+mem_heap_extra_B=1552222
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=156574212
+mem_heap_B=3753374
+mem_heap_extra_B=1803322
+mem_stacks_B=0
+heap_tree=detailed
+n3: 3753374 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3328656 0x10A0AF: rb_insert (source.c:411)
+  n2: 3328656 0x10A5C5: fillEligibles (source.c:556)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n1: 928656 0x10AF41: play (source.c:784)
+    n0: 928656 0x10BF0F: main (source.c:1056)
+ n2: 416088 0x10A546: fillEligibles (source.c:550)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n1: 116088 0x10AF41: play (source.c:784)
+   n0: 116088 0x10BF0F: main (source.c:1056)
+ n0: 8630 in 10 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=4
+#-----------
+time=232413673
+mem_heap_B=3753320
+mem_heap_extra_B=1803456
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=280654058
+mem_heap_B=3974214
+mem_heap_extra_B=1909554
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=347508602
+mem_heap_B=4261800
+mem_heap_extra_B=2047840
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=421342904
+mem_heap_B=4260096
+mem_heap_extra_B=2047544
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=469280968
+mem_heap_B=4261080
+mem_heap_extra_B=2047712
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=545505367
+mem_heap_B=4259872
+mem_heap_extra_B=2047560
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=593465083
+mem_heap_B=4260392
+mem_heap_extra_B=2047632
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=659183761
+mem_heap_B=4705966
+mem_heap_extra_B=2262290
+mem_stacks_B=0
+heap_tree=detailed
+n3: 4705966 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 4175760 0x10A0AF: rb_insert (source.c:411)
+  n3: 4175760 0x10A5C5: fillEligibles (source.c:556)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n1: 1378896 0x10AF41: play (source.c:784)
+    n0: 1378896 0x10BF0F: main (source.c:1056)
+   n0: 396864 0x10BF22: main (source.c:1060)
+ n3: 521976 0x10A546: fillEligibles (source.c:550)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n1: 172362 0x10AF41: play (source.c:784)
+   n0: 172362 0x10BF0F: main (source.c:1056)
+  n0: 49614 in 1 place, below massif's threshold (1.00%)
+ n0: 8230 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=12
+#-----------
+time=707707158
+mem_heap_B=4706344
+mem_heap_extra_B=2262464
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=787143745
+mem_heap_B=4707016
+mem_heap_extra_B=2262640
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=835635021
+mem_heap_B=5120534
+mem_heap_extra_B=2461722
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=906058241
+mem_heap_B=5121628
+mem_heap_extra_B=2461892
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=962682351
+mem_heap_B=5119606
+mem_heap_extra_B=2461602
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=999174478
+mem_heap_B=5119846
+mem_heap_extra_B=2461706
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=1063103807
+mem_heap_B=5578246
+mem_heap_extra_B=2682306
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=1113103342
+mem_heap_B=5579070
+mem_heap_extra_B=2682506
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=1174549577
+mem_heap_B=6052544
+mem_heap_extra_B=2910400
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=1216695140
+mem_heap_B=6050696
+mem_heap_extra_B=2910144
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=1273869261
+mem_heap_B=6579432
+mem_heap_extra_B=3164504
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=1316626697
+mem_heap_B=7090420
+mem_heap_extra_B=3410508
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=1380189117
+mem_heap_B=7464472
+mem_heap_extra_B=3590464
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=1464367147
+mem_heap_B=7462990
+mem_heap_extra_B=3590266
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=1512821024
+mem_heap_B=7463158
+mem_heap_extra_B=3590250
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=1549624422
+mem_heap_B=7463350
+mem_heap_extra_B=3590250
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=1596408965
+mem_heap_B=7463782
+mem_heap_extra_B=3590386
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=1635967882
+mem_heap_B=7883014
+mem_heap_extra_B=3792162
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=1727157216
+mem_heap_B=7882030
+mem_heap_extra_B=3792074
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=1783488124
+mem_heap_B=7882270
+mem_heap_extra_B=3792098
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=1842861154
+mem_heap_B=7882510
+mem_heap_extra_B=3792066
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=1883635459
+mem_heap_B=7882942
+mem_heap_extra_B=3792178
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=1976433619
+mem_heap_B=7882070
+mem_heap_extra_B=3792114
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=2019623975
+mem_heap_B=8377758
+mem_heap_extra_B=4030538
+mem_stacks_B=0
+heap_tree=detailed
+n3: 8377758 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 7438992 0x10A0AF: rb_insert (source.c:411)
+  n3: 7438992 0x10A5C5: fillEligibles (source.c:556)
+   n1: 4642128 0x10AF41: play (source.c:784)
+    n0: 4642128 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 396864 0x10BF22: main (source.c:1060)
+ n3: 929880 0x10A546: fillEligibles (source.c:550)
+  n1: 580272 0x10AF41: play (source.c:784)
+   n0: 580272 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 49608 in 1 place, below massif's threshold (1.00%)
+ n0: 8886 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=36
+#-----------
+time=2055886955
+mem_heap_B=8378456
+mem_heap_extra_B=4030816
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=2133310816
+mem_heap_B=8379344
+mem_heap_extra_B=4031016
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=2185630043
+mem_heap_B=9301830
+mem_heap_extra_B=4475706
+mem_stacks_B=0
+heap_tree=detailed
+n3: 9301830 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 8260944 0x10A0AF: rb_insert (source.c:411)
+  n3: 8260944 0x10A5C5: fillEligibles (source.c:556)
+   n1: 5075424 0x10AF41: play (source.c:784)
+    n0: 5075424 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1032624 0x10A546: fillEligibles (source.c:550)
+  n1: 634434 0x10AF41: play (source.c:784)
+   n0: 634434 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 8262 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=39
+#-----------
+time=2249487400
+mem_heap_B=9302288
+mem_heap_extra_B=4475928
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=2298392949
+mem_heap_B=9303056
+mem_heap_extra_B=4476072
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=2403890275
+mem_heap_B=9302208
+mem_heap_extra_B=4475880
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=2424701604
+mem_heap_B=9812046
+mem_heap_extra_B=4721370
+mem_stacks_B=0
+heap_tree=detailed
+n3: 9812046 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 8714256 0x10A0AF: rb_insert (source.c:411)
+  n3: 8714256 0x10A5C5: fillEligibles (source.c:556)
+   n1: 5528736 0x10AF41: play (source.c:784)
+    n0: 5528736 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1089288 0x10A546: fillEligibles (source.c:550)
+  n1: 691098 0x10AF41: play (source.c:784)
+   n0: 691098 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 8502 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=43
+#-----------
+time=2487776239
+mem_heap_B=9812352
+mem_heap_extra_B=4721520
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=2524296150
+mem_heap_B=9812696
+mem_heap_extra_B=4721672
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=2597487586
+mem_heap_B=9813912
+mem_heap_extra_B=4721920
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=2658269530
+mem_heap_B=10220262
+mem_heap_extra_B=4917994
+mem_stacks_B=0
+heap_tree=detailed
+n3: 10220262 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 9077328 0x10A0AF: rb_insert (source.c:411)
+  n3: 9077328 0x10A5C5: fillEligibles (source.c:556)
+   n1: 5891808 0x10AF41: play (source.c:784)
+    n0: 5891808 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1134672 0x10A546: fillEligibles (source.c:550)
+  n1: 736482 0x10AF41: play (source.c:784)
+   n0: 736482 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 8262 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=47
+#-----------
+time=2757154000
+mem_heap_B=10220680
+mem_heap_extra_B=4918192
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=2835022268
+mem_heap_B=10656956
+mem_heap_extra_B=5128068
+mem_stacks_B=0
+heap_tree=detailed
+n3: 10656956 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 9464448 0x10A0AF: rb_insert (source.c:411)
+  n3: 9464448 0x10A5C5: fillEligibles (source.c:556)
+   n1: 6278928 0x10AF41: play (source.c:784)
+    n0: 6278928 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1183062 0x10A546: fillEligibles (source.c:550)
+  n1: 784872 0x10AF41: play (source.c:784)
+   n0: 784872 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 9446 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=49
+#-----------
+time=2854780421
+mem_heap_B=10657214
+mem_heap_extra_B=5128202
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=2875593322
+mem_heap_B=10884416
+mem_heap_extra_B=5237560
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=2884864387
+mem_heap_B=11075954
+mem_heap_extra_B=5329782
+mem_stacks_B=0
+heap_tree=detailed
+n3: 11075954 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 9836592 0x10A0AF: rb_insert (source.c:411)
+  n3: 9836592 0x10A5C5: fillEligibles (source.c:556)
+   n1: 6651072 0x10AF41: play (source.c:784)
+    n0: 6651072 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1229580 0x10A546: fillEligibles (source.c:550)
+  n1: 831390 0x10AF41: play (source.c:784)
+   n0: 831390 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 9782 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=52
+#-----------
+time=2912153072
+mem_heap_B=11076164
+mem_heap_extra_B=5329892
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=2924478842
+mem_heap_B=11603850
+mem_heap_extra_B=5584406
+mem_stacks_B=0
+heap_tree=detailed
+n3: 11603850 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 10307184 0x10A0AF: rb_insert (source.c:411)
+  n3: 10307184 0x10A5C5: fillEligibles (source.c:556)
+   n1: 7121664 0x10AF41: play (source.c:784)
+    n0: 7121664 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1288404 0x10A546: fillEligibles (source.c:550)
+  n1: 890214 0x10AF41: play (source.c:784)
+   n0: 890214 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 8262 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=54
+#-----------
+time=3041077487
+mem_heap_B=11604228
+mem_heap_extra_B=5584580
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=3123448218
+mem_heap_B=11604468
+mem_heap_extra_B=5584684
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=3180029915
+mem_heap_B=11604708
+mem_heap_extra_B=5584724
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=3215748198
+mem_heap_B=11604876
+mem_heap_extra_B=5584740
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=3243606582
+mem_heap_B=11605068
+mem_heap_extra_B=5584772
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=3278282573
+mem_heap_B=11605092
+mem_heap_extra_B=5584740
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=3299095394
+mem_heap_B=11948652
+mem_heap_extra_B=5750188
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=3308080497
+mem_heap_B=12095856
+mem_heap_extra_B=5821064
+mem_stacks_B=0
+heap_tree=detailed
+n3: 12095856 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 10743456 0x10A0AF: rb_insert (source.c:411)
+  n3: 10743456 0x10A5C5: fillEligibles (source.c:556)
+   n1: 7557936 0x10AF41: play (source.c:784)
+    n0: 7557936 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1342938 0x10A546: fillEligibles (source.c:550)
+  n1: 944748 0x10AF41: play (source.c:784)
+   n0: 944748 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 9462 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=62
+#-----------
+time=3335924908
+mem_heap_B=12096130
+mem_heap_extra_B=5821214
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=3356738378
+mem_heap_B=12435568
+mem_heap_extra_B=5984616
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=3360977433
+mem_heap_B=12504364
+mem_heap_extra_B=6017740
+mem_stacks_B=0
+heap_tree=detailed
+n3: 12504364 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 11106432 0x10A0AF: rb_insert (source.c:411)
+  n3: 11106432 0x10A5C5: fillEligibles (source.c:556)
+   n1: 7920912 0x10AF41: play (source.c:784)
+    n0: 7920912 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1388310 0x10A546: fillEligibles (source.c:550)
+  n1: 990120 0x10AF41: play (source.c:784)
+   n0: 990120 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 9622 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=65
+#-----------
+time=3473867362
+mem_heap_B=12503422
+mem_heap_extra_B=6017738
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=3505026152
+mem_heap_B=12503662
+mem_heap_extra_B=6017762
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=3533108612
+mem_heap_B=12504174
+mem_heap_extra_B=6017938
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=3556322088
+mem_heap_B=12504390
+mem_heap_extra_B=6017938
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=3579516003
+mem_heap_B=12504630
+mem_heap_extra_B=6017978
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=3602691030
+mem_heap_B=12504982
+mem_heap_extra_B=6018058
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=3623502642
+mem_heap_B=12685904
+mem_heap_extra_B=6105160
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=3640200173
+mem_heap_B=13012874
+mem_heap_extra_B=6262590
+mem_stacks_B=0
+heap_tree=detailed
+n3: 13012874 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 11557872 0x10A0AF: rb_insert (source.c:411)
+  n3: 11557872 0x10A5C5: fillEligibles (source.c:556)
+   n1: 8372352 0x10AF41: play (source.c:784)
+    n0: 8372352 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1444740 0x10A546: fillEligibles (source.c:550)
+  n1: 1046550 0x10AF41: play (source.c:784)
+   n0: 1046550 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 10262 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=73
+#-----------
+time=3661014119
+mem_heap_B=13184486
+mem_heap_extra_B=6345218
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=3673879519
+mem_heap_B=13435478
+mem_heap_extra_B=6466066
+mem_stacks_B=0
+heap_tree=peak
+n3: 13435478 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 11933520 0x10A0AF: rb_insert (source.c:411)
+  n3: 11933520 0x10A5C5: fillEligibles (source.c:556)
+   n1: 8748000 0x10AF41: play (source.c:784)
+    n0: 8748000 0x10BF0F: main (source.c:1056)
+   n0: 2400000 0x10BE6E: main (source.c:1037)
+   n0: 785520 0x10BF22: main (source.c:1060)
+ n3: 1491696 0x10A546: fillEligibles (source.c:550)
+  n1: 1093506 0x10AF41: play (source.c:784)
+   n0: 1093506 0x10BF0F: main (source.c:1056)
+  n0: 300000 0x10BE6E: main (source.c:1037)
+  n0: 98190 in 1 place, below massif's threshold (1.00%)
+ n0: 10262 in 14 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=75
+#-----------
+time=3706962878
+mem_heap_B=13435688
+mem_heap_extra_B=6466208
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=3727774223
+mem_heap_B=8468296
+mem_heap_extra_B=4074312
+mem_stacks_B=0
+heap_tree=empty

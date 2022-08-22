@@ -70,9 +70,8 @@ typedef struct tree_node {
     struct tree_node *parent;
     rb_color color;
     char *key;
-    char *ordered;
+    // char *ordered;
     int used;
-    // CharFilter chars;
 } tree_node;
 typedef tree_node *tree;
 
@@ -410,19 +409,19 @@ void rb_insert(tree *t, char *key) {
     tree_node *y = NULL;
     tree_node *x = *t;
     tree_node *z = (tree)malloc(sizeof(tree_node));
-    Word ord;
-    ord.pos = (int *)malloc(sizeof(int) * (k + 1));
-    ord.w = (char *)malloc(sizeof(char) * (k + 1));
-    for (int i = 0; i < k; i++) {
-        ord.pos[i] = i;
-        ord.w[i] = key[i];
-    }
-    ord.w[k] = '\0';
-    heap_sort(&ord, k);
-    z->ordered = (char *)malloc(sizeof(char) * (k + 1));
-    strcpy(z->ordered, ord.w);
-    free(ord.pos);
-    free(ord.w);
+    // Word ord;
+    // ord.pos = (int *)malloc(sizeof(int) * (k + 1));
+    // ord.w = (char *)malloc(sizeof(char) * (k + 1));
+    // for (int i = 0; i < k; i++) {
+    //     ord.pos[i] = i;
+    //     ord.w[i] = key[i];
+    // }
+    // ord.w[k] = '\0';
+    // heap_sort(&ord, k);
+    // z->ordered = (char *)malloc(sizeof(char) * (k + 1));
+    // strcpy(z->ordered, ord.w);
+    // free(ord.pos);
+    // free(ord.w);
     z->key = key;
     z->used = 0;
     e++;
@@ -620,17 +619,23 @@ void fillEligibles(tree *t, Alph f) {
     } while (1);
 }
 
+void getApp(int *arr, char *str) {
+    for (int i = 0; i < k; i++) arr[h(str[i])]++;
+}
+
 void excludeOthers(tree t, Check f) {
     if (t != NULL) {
         excludeOthers(t->left, f);
         excludeOthers(t->right, f);
         if (t->used < match) {
-            char app[64] = {0};
-            for (int i = 0; i < k; i++) app[h(t->key[i])]++;
+            int app[64] = {0};
+            getApp(app, t->key);
+            // for (int i = 0; i < k; i++) app[h(t->key[i])]++;
             for (Check i = f; i != NULL; i = i->next) {
+                int pos = h(i->c);
                 switch (i->type) {
                     case 0:
-                        if (i->value == 1 && app[h(i->c)] != 0) {
+                        if (i->value == 1 && app[pos] != 0) {
                             // The char is present in the word but it should not be
                             exclude(t);
 #ifdef PROMPTREMOVE
@@ -638,7 +643,7 @@ void excludeOthers(tree t, Check f) {
 #endif
                             return;
                         }
-                        if (i->value == 0 && app[h(i->c)] == 0) {
+                        if (i->value == 0 && app[pos] == 0) {
                             // The char is not present in the word but it should be
                             exclude(t);
 #ifdef PROMPTREMOVE
@@ -668,21 +673,21 @@ void excludeOthers(tree t, Check f) {
                         }
                         break;
                     case 3:
-                        if (app[h(i->c)] < i->value) {
+                        if (app[pos] < i->value) {
                             // The char does not appear enough times
                             exclude(t);
 #ifdef PROMPTREMOVE
-                            printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[h(i->c)]);
+                            printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                             return;
                         }
                         break;
                     case 4:
-                        if (app[h(i->c)] != i->value) {
+                        if (app[pos] != i->value) {
                             // The char does not appear the exact number of times
                             exclude(t);
 #ifdef PROMPTREMOVE
-                            printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[h(i->c)]);
+                            printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                             return;
                         }
@@ -716,7 +721,7 @@ void freeTree(tree root) {
         freeTree(root->left);
         freeTree(root->right);
         free(root->key);
-        free(root->ordered);
+        // free(root->ordered);
         free(root);
     }
 }
@@ -825,7 +830,7 @@ void play(int max, char *ref, tree *elig) {
                     attempts++;
 
                     // Update the filter
-                    char tempMinApps[64] = {0};  // Appearences of each char in this string
+                    int tempMinApps[64] = {0};  // Appearences of each char in this string
 
                     for (int i = 0; i < k; i++) {
                         int tempCharPos = h(ordWord.w[i]);
@@ -1065,13 +1070,3 @@ int main(int argc, char const *argv[]) {
     free(ref);
     return 0;
 }
-
-/*
-Quando faccio excludeOthers dopo aver letto una parola da input in play, mi basta analizzare solamente i filtri NUOVI appena
-acquisiti dalla parola in input, mentre invece devo scorrere tutto l'albero di Alph nel caso in cui io stia aggiungendo da
-fillEligibles.
-*/
-
-/*414 di output correct, parola */
-/*420 di output */
-/*AAmAN ultima parola comune*/
