@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define PROMPTREMOVE
-#define PROMPTALPH
+#define PROMPTREMOVE
 
 // =======================================================
 // TYPE DEFINITION
@@ -738,11 +737,9 @@ void fillEligibiles() {
                         break;
                     }
                 }
-                if (flag) {
-                    // The word is eligibile
-                    rb_insert(&eligibiles, toAdd);
-                    e++;
-                }
+                // If we made it here, the word is eligibile
+                rb_insert(&eligibiles, toAdd);
+                e++;
             }
         } else
             return;
@@ -750,11 +747,11 @@ void fillEligibiles() {
 }
 
 void excludeOthers(rb_node *t, Check c) {
-    rb_node *j = rb_minimum(t);
-nw:;
-    while (j != Tnil) {
+    if (t != Tnil) {
+        excludeOthers(t->left, c);
+        excludeOthers(t->right, c);
         int app[64] = {0};
-        getApp(app, j->key);
+        getApp(app, t->key);
         int flag = 1;  // If we can move on the next char in the check
 
         for (Check i = c; i != NULL; i = i->next) {
@@ -765,33 +762,33 @@ nw:;
                         // The char is present in the word but it should not be
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should not appear\n", j->key, i->c);
+                        printf("Removing %s because %c should not appear\n", t->key, i->c);
 #endif
                     } else if (i->value == 0 && app[pos] == 0) {
                         // The char is not present in the word but it should be
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear\n", j->key, i->c);
+                        printf("Removing %s because %c should appear\n", t->key, i->c);
 #endif
                     }
                     break;
 
                 case 1:
-                    if (j->key[i->value] != i->c) {
+                    if (t->key[i->value] != i->c) {
                         // The char is not in a mandatory position
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should be in position %d, instead there is %c\n", j->key, i->c, i->value, t->key[i->value]);
+                        printf("Removing %s because %c should be in position %d, instead there is %c\n", t->key, i->c, i->value, t->key[i->value]);
 #endif
                     }
                     break;
 
                 case 2:
-                    if (j->key[i->value] == i->c) {
+                    if (t->key[i->value] == i->c) {
                         // The char is in a forbidden position
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should not be in position %d\n", j->key, i->c, i->value);
+                        printf("Removing %s because %c should not be in position %d\n", t->key, i->c, i->value);
 #endif
                     }
                     break;
@@ -801,7 +798,7 @@ nw:;
                         // The char does not appear enough times
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", j->key, i->c, i->value, app[pos]);
+                        printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                     }
                     break;
@@ -811,7 +808,7 @@ nw:;
                         // The char does not appear the exact number of times
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", j->key, i->c, i->value, app[pos]);
+                        printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                     }
                     break;
@@ -819,34 +816,20 @@ nw:;
                 default:
                     break;
             }
-
             if (!flag) {
                 // The word is not valid
-                // rb_insert(&forbidden, t->key);
-                // rb_delete(&eligibiles, rb_search(&eligibiles, t->key));
-
-                rb_node *prec = j;
-                j = rb_successor(j);
-                rb_insert(&forbidden, prec->key);
-                rb_delete(&eligibiles, prec);
+                rb_insert(&forbidden, t->key);
+                rb_delete(&eligibiles, rb_search(&eligibiles, t->key));
                 e--;
-                // return;
-
-                goto nw;
+                return;
             }
         }
         // The word is valid
-        // return;
-        j = rb_successor(j);
+        return;
     }
 }
 
 void play(int max, char *ref) {
-#ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("debug/alphabet.txt", "a");
-    fprintf(fpalphabet, "\n\n==============\nPartita ref %s\n==============\n\n", ref);
-#endif
-
     int attempts = 0;                                         // Number of attempts done until now
     Word input;                                               // The input word, read every time from stdin
     char *orderRef = (char *)malloc(sizeof(char) * (k + 1));  // Reference word in ascii order
@@ -858,9 +841,6 @@ void play(int max, char *ref) {
     output[k] = '\0';
     input.c = (char *)malloc(sizeof(char) * (k + 1));
     input.pos = (int *)malloc(sizeof(int) * (k + 1));
-#ifdef PROMPTALPH
-    char *cpy = (char *)malloc(sizeof(char) * (k + 1));
-#endif
 
     do {
         if (attempts >= max) {
@@ -890,10 +870,6 @@ void play(int max, char *ref) {
                 }
                 input.c[k] = '\0';
                 getchar();  // \n
-
-#ifdef PROMPTALPH
-                strcpy(cpy, input.c);
-#endif
 
                 rb_node *node = rb_search(&eligibiles, input.c);
 
@@ -1038,54 +1014,8 @@ void play(int max, char *ref) {
 
                     printf("%s\n", output);
                     excludeOthers(eligibiles.root, newInfo);
-#ifndef PROMPTALPH
                     freeCheck(newInfo);
-#endif
                     printf("%d\n", e);
-
-#ifdef PROMPTALPH
-                    fprintf(fpalphabet, "Dopo la lettura della parola %s abbiamo le seguenti nuove info: %s\n", cpy, output);
-                    for (Three *temp = newInfo; temp != NULL; temp = temp->next) {
-                        switch (temp->type) {
-                            case 0:
-                                if (temp->value)
-                                    fprintf(fpalphabet, "Il carattere %c non deve apparire\n", temp->c);
-                                else
-                                    fprintf(fpalphabet, "Il carattere %c deve apparire\n", temp->c);
-                                break;
-                            case 1:
-                                fprintf(fpalphabet, "Il carattere %c deve apparire in posizione %d\n", temp->c, temp->value);
-                                break;
-                            case 2:
-                                fprintf(fpalphabet, "Il carattere %c non deve apparire in posizione %d\n", temp->c, temp->value);
-                                break;
-                            case 3:
-                                fprintf(fpalphabet, "Il carattere %c appare almeno %d volte\n", temp->c, temp->value);
-                                break;
-                            case 4:
-                                fprintf(fpalphabet, "Il carattere %c appare esattamente %d volte\n", temp->c, temp->value);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    freeCheck(newInfo);
-                    fprintf(fpalphabet, "\nPer cui l'alfabeto completo risulta:\n");
-                    for (bst_node *i = bst_minimum(alphabet); i != NULL; i = bst_successor(i)) {
-                        fprintf(fpalphabet, "Character %c:\n", i->c);
-                        if (i->memb) {
-                            fprintf(fpalphabet, "\tnot member\n");
-                        } else {
-                            fprintf(fpalphabet, "app: %d\n", i->app);
-                            fprintf(fpalphabet, "Positions: ");
-                            for (Positions j = i->pos; j != NULL; j = j->next) {
-                                fprintf(fpalphabet, "%d%c, ", j->n, j->f ? 'M' : 'F');
-                            }
-                        }
-                        fprintf(fpalphabet, "\n\n\n");
-                    }
-
-#endif
                 }
             }
         }
@@ -1097,11 +1027,6 @@ exit:;
     free(input.pos);
     freeAlphabet(alphabet);
     resetEligibiles();
-
-#ifdef PROMPTALPH
-    fclose(fpalphabet);
-#endif
-
     return;
 }
 
@@ -1114,12 +1039,6 @@ int main(int argc, char const *argv[]) {
     char *ref = (char *)malloc(sizeof(char) * (k + 1));  // Reference word
     int max;                                             // Maximum number of attempts allowed
     toAdd = (char *)malloc(sizeof(char) * (k + 1));
-
-#ifdef PROMPTALPH
-    FILE *fpalphabet = fopen("debug/alphabet.txt", "w");
-    fprintf(fpalphabet, "Alphabet file\n");
-    fclose(fpalphabet);
-#endif
 
     fillEligibiles();
 

@@ -3,7 +3,7 @@
 #include <string.h>
 
 //#define PROMPTALPH
-#define PROMPTREMOVE
+//#define PROMPTREMOVE
 
 // bkcn<kbjadbjcanj nad for a linked list node
 typedef struct EL {
