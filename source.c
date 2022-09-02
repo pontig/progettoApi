@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define PROMPTREMOVE
 #define PROMPTALPH
+#define PROMPTREMOVE
 
 // =======================================================
 // TYPE DEFINITION
@@ -637,6 +637,7 @@ void merge_trees(rb_tree final, rb_node *source) {
         merge_trees(final, source->left);
         merge_trees(final, source->right);
         rb_insert(&final, source->key);
+        free(source->key);
         free(source);
     }
     return;
@@ -847,14 +848,15 @@ void play(int max, char *ref) {
     fprintf(fpalphabet, "\n\n==============\nPartita ref %s\n==============\n\n", ref);
 #endif
 
-    int attempts = 0;                                         // Number of attempts done until now
-    Word input;                                               // The input word, read every time from stdin
-    char *orderRef = (char *)malloc(sizeof(char) * (k + 1));  // Reference word in ascii order
-    char *output = (char *)malloc(sizeof(char) * (k + 1));    // Output string
-    int tempFlag;                                             // Meh
+    int attempts = 0;  // Number of attempts done until now
+    Word input;        // The input word, read every time from stdin
+    // char *orderRef = (char *)malloc(sizeof(char) * (k + 1));  // Reference word in ascii order
+    char *output = (char *)malloc(sizeof(char) * (k + 1));  // Output string
+    char *tildes = (char *)malloc(sizeof(char) * (k + 1));  // Reference word to edit
+    int tempFlag;                                           // Meh
 
-    strcpy(orderRef, ref);
-    sortChar(orderRef);
+    // strcpy(orderRef, ref);
+    // sortChar(orderRef);
     output[k] = '\0';
     input.c = (char *)malloc(sizeof(char) * (k + 1));
     input.pos = (int *)malloc(sizeof(int) * (k + 1));
@@ -909,90 +911,108 @@ void play(int max, char *ref) {
                     printf("not_exists\n");
                 } else {
                     attempts++;
-                    sortWord(&input);
                     Check newInfo = NULL;   // New info to be added to the check
                     int hi = 0;             // Head on the input word
                     int hr = 0;             // Head on the reference word
                     int counter = 0;        // Number of '+' to print
                     int minApps[64] = {0};  // Minimum number of appearances of each char
-                    do {
-                        int posOfHi = h(input.c[hi]);
-                        if (hr < k && input.c[hi] > orderRef[hr] /* || orderRef[hr] == '~' */)
-                            hr++;
+                    strcpy(tildes, ref);
 
-                        else if (hr < k && input.c[hi] == orderRef[hr]) {
-                            bst_node *alreadyKnow = bst_search(&alphabet, input.c[hi]);
-                            if (ref[input.pos[hi]] == input.c[hi]) {
-                                // Right char in right position
-                                output[input.pos[hi]] = '+';
-                                counter++;
-                                minApps[posOfHi]++;
+                    for (int i = 0; i < k; i++) {
+                        if (input.c[i] == ref[i]) {
+                            // Right char in right position
+                            bst_node *alreadyKnow = bst_search(&alphabet, input.c[i]);
+                            int posOfI = h(input.c[i]);
+                            output[i] = '+';
+                            counter++;
+                            minApps[posOfI]++;
 
-                                if (alreadyKnow == NULL) {
-                                    // We don't know anything about this char yet
-                                    bst_node *new = (bst_node *)malloc(sizeof(bst_node));
-                                    new->c = input.c[hi];
-                                    new->app = 0;
-                                    new->app = -1;
-                                    new->pos = NULL;
-                                    tempFlag = pos_insert(&new->pos, input.pos[hi], 1);
+                            if (alreadyKnow == NULL) {
+                                // We don't know anything about this char yet
+                                bst_node *new = (bst_node *)malloc(sizeof(bst_node));
+                                new->c = input.c[i];
+                                new->app = 0;
+                                new->app = -1;
+                                new->pos = NULL;
+                                tempFlag = pos_insert(&new->pos, input.pos[i], 1);
 
-                                    bst_insert(&alphabet, new);
+                                bst_insert(&alphabet, new);
 
-                                    // the only thing that we have to check about this char
-                                    // for the next excludeOther is to check if the char is in a mandatory position
-                                    new_info_insert(&newInfo, input.c[hi], 1, input.pos[hi]);
-                                } else {
-                                    // We have to check what we already know about this char
-                                    if (alreadyKnow->app < 0 && -1 * minApps[posOfHi] < alreadyKnow->app) {
-                                        // It appears more times than we knew and it is ok
-                                        new_info_insert(&newInfo, input.c[hi], 3, minApps[posOfHi]);
-                                        alreadyKnow->app = -1 * minApps[posOfHi];
-                                    }
-                                    tempFlag = pos_insert(&alreadyKnow->pos, input.pos[hi], 1);
-                                    if (tempFlag) {
-                                        // We have found a new mandatory position for this char
-                                        new_info_insert(&newInfo, input.c[hi], 1, input.pos[hi]);
-                                    }
-                                }
+                                // the only thing that we have to check about this char
+                                // for the next excludeOther is to check if the char is in a mandatory position
+                                new_info_insert(&newInfo, input.c[i], 1, input.pos[i]);
                             } else {
-                                // Right char in wrong position
-                                output[input.pos[hi]] = '|';
-                                minApps[posOfHi]++;
-
-                                if (alreadyKnow == NULL) {
-                                    // We don't know anything about this char yet
-                                    bst_node *new = (bst_node *)malloc(sizeof(bst_node));
-                                    new->c = input.c[hi];
-                                    new->memb = 0;
-                                    new->app = -1;
-                                    new->pos = NULL;
-                                    tempFlag = pos_insert(&new->pos, input.pos[hi], 0);
-
-                                    bst_insert(&alphabet, new);
-
-                                    // this time we have to check another thing than in the previous case
-                                    new_info_insert(&newInfo, input.c[hi], 3, minApps[posOfHi]);
-                                    new_info_insert(&newInfo, input.c[hi], 2, input.pos[hi]);
-                                } else {
-                                    // We have to check what we already know about this char
-                                    if (alreadyKnow->app < 0 && -1 * minApps[posOfHi] < alreadyKnow->app) {
-                                        // It appears more times than we knew and it is ok
-                                        new_info_insert(&newInfo, input.c[hi], 3, minApps[posOfHi]);
-                                        alreadyKnow->app = -1 * minApps[posOfHi];
-                                    }
-                                    tempFlag = pos_insert(&alreadyKnow->pos, input.pos[hi], 0);
-                                    if (tempFlag) {
-                                        // We have found a new forbidden position for this char
-                                        new_info_insert(&newInfo, input.c[hi], 2, input.pos[hi]);
-                                    }
+                                // We have to check what we already know about this char
+                                if (alreadyKnow->app < 0 && -1 * minApps[posOfI] < alreadyKnow->app) {
+                                    // It appears more times than we knew and it is ok
+                                    new_info_insert(&newInfo, input.c[i], 3, minApps[posOfI]);
+                                    alreadyKnow->app = -1 * minApps[posOfI];
+                                }
+                                tempFlag = pos_insert(&alreadyKnow->pos, input.pos[i], 1);
+                                if (tempFlag) {
+                                    // We have found a new mandatory position for this char
+                                    new_info_insert(&newInfo, input.c[i], 1, input.pos[i]);
                                 }
                             }
+
+                            tildes[i] = '~';
+                            input.c[i] = '~';
+                        }
+                    }
+
+                    if (counter == k) {
+                        printf("ok\n");
+                        goto exit;
+                    }
+
+                    sortWord(&input);
+                    sortChar(tildes);
+
+                    do {
+                        int posOfHi = h(input.c[hi]);
+                        if (hr < k - counter && input.c[hi] > tildes[hr] /* || tildes[hr] == '~' */)
+                            hr++;
+
+                        else if (hr < k - counter && input.c[hi] == tildes[hr]) {
+                            bst_node *alreadyKnow = bst_search(&alphabet, input.c[hi]);
+
+                            // Right char in wrong position
+                            output[input.pos[hi]] = '|';
+                            minApps[posOfHi]++;
+
+                            if (alreadyKnow == NULL) {
+                                // We don't know anything about this char yet
+                                bst_node *new = (bst_node *)malloc(sizeof(bst_node));
+                                new->c = input.c[hi];
+                                new->memb = 0;
+                                new->app = -1;
+                                new->pos = NULL;
+                                tempFlag = pos_insert(&new->pos, input.pos[hi], 0);
+
+                                bst_insert(&alphabet, new);
+
+                                // this time we have to check another thing than in the previous case
+                                new_info_insert(&newInfo, input.c[hi], 3, minApps[posOfHi]);
+                                new_info_insert(&newInfo, input.c[hi], 2, input.pos[hi]);
+                            } else {
+                                // We have to check what we already know about this char
+                                if (alreadyKnow->app < 0 && -1 * minApps[posOfHi] < alreadyKnow->app) {
+                                    // It appears more times than we knew and it is ok
+                                    new_info_insert(&newInfo, input.c[hi], 3, minApps[posOfHi]);
+                                    alreadyKnow->app = -1 * minApps[posOfHi];
+                                }
+                                tempFlag = pos_insert(&alreadyKnow->pos, input.pos[hi], 0);
+                                if (tempFlag) {
+                                    // We have found a new forbidden position for this char
+                                    new_info_insert(&newInfo, input.c[hi], 2, input.pos[hi]);
+                                }
+                            }
+
                             hi++;
                             hr++;
                         }
 
-                        else if (hr >= k || input.c[hi] < orderRef[hr]) {
+                        else if (hr >= k - counter || input.c[hi] < tildes[hr]) {
                             // Char not in the reference word or char appeared too many times
                             bst_node *alreadyKnow = bst_search(&alphabet, input.c[hi]);
                             output[input.pos[hi]] = '/';
@@ -1029,12 +1049,7 @@ void play(int max, char *ref) {
                             }
                             hi++;
                         }
-                    } while (hi < k);
-
-                    if (counter == k) {
-                        printf("ok\n");
-                        goto exit;
-                    }
+                    } while (hi < k - counter);
 
                     printf("%s\n", output);
                     excludeOthers(eligibiles.root, newInfo);
@@ -1091,7 +1106,7 @@ void play(int max, char *ref) {
         }
     } while (1);
 exit:;
-    free(orderRef);
+    free(tildes);
     free(output);
     free(input.c);
     free(input.pos);

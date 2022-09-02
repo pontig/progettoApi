@@ -2,62 +2,27 @@ Alphabet file
 
 
 ==============
-Partita ref NAmNm
+Partita ref 2rj9R
 ==============
 
-Dopo la lettura della parola mGNCC abbiamo le seguenti nuove info: |/|//
-Il carattere m non deve apparire in posizione 0
-Il carattere m appare almeno 1 volte
-Il carattere N non deve apparire in posizione 2
-Il carattere N appare almeno 1 volte
-Il carattere G non deve apparire
-Il carattere C non deve apparire
-
-Per cui l'alfabeto completo risulta:
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
-app: -1
-Positions: 2F, 
-
-
-Character m:
-app: -1
-Positions: 0F, 
-
-
-Dopo la lettura della parola dmCbm abbiamo le seguenti nuove info: /|//+
-Il carattere m deve apparire in posizione 4
-Il carattere m appare almeno 2 volte
-Il carattere m non deve apparire in posizione 1
+Dopo la lettura della parola 2PFdd abbiamo le seguenti nuove info: +////
 Il carattere d non deve apparire
-Il carattere b non deve apparire
+Il carattere P non deve apparire
+Il carattere F non deve apparire
+Il carattere 2 deve apparire in posizione 0
 
 Per cui l'alfabeto completo risulta:
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character 2:
 app: -1
-Positions: 2F, 
+Positions: 0M, 
 
 
-Character b:
+Character F:
+	not member
+
+
+
+Character P:
 	not member
 
 
@@ -67,106 +32,36 @@ Character d:
 
 
 
-Character m:
-app: -2
-Positions: 0F, 1F, 4M, 
-
-
-Dopo la lettura della parola CNGGm abbiamo le seguenti nuove info: /|//+
-Il carattere m deve apparire in posizione 4
-Il carattere N non deve apparire in posizione 1
+Dopo la lettura della parola 2rz9R abbiamo le seguenti nuove info: ++/++
+Il carattere z non deve apparire
+Il carattere R deve apparire in posizione 4
+Il carattere 9 deve apparire in posizione 3
+Il carattere r deve apparire in posizione 1
 
 Per cui l'alfabeto completo risulta:
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character 2:
 app: -1
-Positions: 1F, 2F, 
+Positions: 0M, 
 
 
-Character b:
-	not member
-
-
-
-Character d:
-	not member
-
-
-
-Character m:
-app: -2
-Positions: 0F, 1F, 4M, 
-
-
-Dopo la lettura della parola bmmNG abbiamo le seguenti nuove info: /|++/
-Il carattere m deve apparire in posizione 2
-Il carattere m non deve apparire in posizione 1
-Il carattere N deve apparire in posizione 3
-
-Per cui l'alfabeto completo risulta:
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character 9:
 app: -1
-Positions: 1F, 2F, 3M, 
+Positions: 3M, 
 
 
-Character b:
+Character F:
 	not member
 
 
 
-Character d:
+Character P:
 	not member
 
 
 
-Character m:
-app: -2
-Positions: 0F, 1F, 2M, 4M, 
-
-
-Dopo la lettura della parola GmNmb abbiamo le seguenti nuove info: /|||/
-Il carattere m non deve apparire in posizione 3
-Il carattere m non deve apparire in posizione 1
-Il carattere N non deve apparire in posizione 2
-
-Per cui l'alfabeto completo risulta:
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character R:
 app: -1
-Positions: 1F, 2F, 3M, 
-
-
-Character b:
-	not member
-
+Positions: 4M, 
 
 
 Character d:
@@ -174,84 +69,43 @@ Character d:
 
 
 
-Character m:
-app: -2
-Positions: 0F, 1F, 2M, 3F, 4M, 
-
-
-Dopo la lettura della parola AdmAm abbiamo le seguenti nuove info: |/+/+
-Il carattere m deve apparire in posizione 4
-Il carattere m deve apparire in posizione 2
-Il carattere A non deve apparire in posizione 3
-Il carattere A appare esattamente 1 volte
-Il carattere A non deve apparire in posizione 0
-Il carattere A appare almeno 1 volte
-
-Per cui l'alfabeto completo risulta:
-Character A:
-app: 1
-Positions: 0F, 3F, 
-
-
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character r:
 app: -1
-Positions: 1F, 2F, 3M, 
+Positions: 1M, 
 
 
-Character b:
+Character z:
 	not member
 
 
 
-Character d:
-	not member
-
-
-
-Character m:
-app: -2
-Positions: 0F, 1F, 2M, 3F, 4M, 
-
-
-Dopo la lettura della parola bAbNm abbiamo le seguenti nuove info: /+/++
-Il carattere m deve apparire in posizione 4
-Il carattere N deve apparire in posizione 3
-Il carattere A deve apparire in posizione 1
+Dopo la lettura della parola 2rq9R abbiamo le seguenti nuove info: ++/++
+Il carattere q non deve apparire
 
 Per cui l'alfabeto completo risulta:
-Character A:
-app: 1
-Positions: 0F, 1M, 3F, 
-
-
-Character C:
-	not member
-
-
-
-Character G:
-	not member
-
-
-
-Character N:
+Character 2:
 app: -1
-Positions: 1F, 2F, 3M, 
+Positions: 0M, 
 
 
-Character b:
+Character 9:
+app: -1
+Positions: 3M, 
+
+
+Character F:
 	not member
 
+
+
+Character P:
+	not member
+
+
+
+Character R:
+app: -1
+Positions: 4M, 
 
 
 Character d:
@@ -259,25 +113,35 @@ Character d:
 
 
 
-Character m:
-app: -2
-Positions: 0F, 1F, 2M, 3F, 4M, 
+Character q:
+	not member
 
 
-Dopo la lettura della parola NAdmN abbiamo le seguenti nuove info: ++/||
-Il carattere m non deve apparire in posizione 3
-Il carattere N non deve apparire in posizione 4
-Il carattere N appare almeno 2 volte
-Il carattere N deve apparire in posizione 0
-Il carattere A deve apparire in posizione 1
+
+Character r:
+app: -1
+Positions: 1M, 
+
+
+Character z:
+	not member
+
+
+
+
+
+==============
+Partita ref 2rj9R
+==============
+
+Dopo la lettura della parola 7PGPU abbiamo le seguenti nuove info: /////
+Il carattere U non deve apparire
+Il carattere P non deve apparire
+Il carattere G non deve apparire
+Il carattere 7 non deve apparire
 
 Per cui l'alfabeto completo risulta:
-Character A:
-app: 1
-Positions: 0F, 1M, 3F, 
-
-
-Character C:
+Character 7:
 	not member
 
 
@@ -287,21 +151,105 @@ Character G:
 
 
 
-Character N:
-app: -2
-Positions: 0M, 1F, 2F, 3M, 4F, 
-
-
-Character b:
+Character P:
 	not member
 
 
 
-Character d:
+Character U:
 	not member
 
 
 
-Character m:
-app: -2
-Positions: 0F, 1F, 2M, 3F, 4M,
+Dopo la lettura della parola 2rz9R abbiamo le seguenti nuove info: ++/++
+Il carattere z non deve apparire
+Il carattere R deve apparire in posizione 4
+Il carattere 9 deve apparire in posizione 3
+Il carattere r deve apparire in posizione 1
+Il carattere 2 deve apparire in posizione 0
+
+Per cui l'alfabeto completo risulta:
+Character 2:
+app: -1
+Positions: 0M, 
+
+
+Character 7:
+	not member
+
+
+
+Character 9:
+app: -1
+Positions: 3M, 
+
+
+Character G:
+	not member
+
+
+
+Character P:
+	not member
+
+
+
+Character R:
+app: -1
+Positions: 4M, 
+
+
+Character U:
+	not member
+
+
+
+Character r:
+app: -1
+Positions: 1M, 
+
+
+Character z:
+	not member
+
+
+
+
+
+==============
+Partita ref 2PFdd
+==============
+
+Dopo la lettura della parola 2rq9R abbiamo le seguenti nuove info: +////
+Il carattere r non deve apparire
+Il carattere q non deve apparire
+Il carattere R non deve apparire
+Il carattere 9 non deve apparire
+Il carattere 2 deve apparire in posizione 0
+
+Per cui l'alfabeto completo risulta:
+Character 2:
+app: -1
+Positions: 0M, 
+
+
+Character 9:
+	not member
+
+
+
+Character R:
+	not member
+
+
+
+Character q:
+	not member
+
+
+
+Character r:
+	not member
+
+
+
