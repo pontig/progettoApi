@@ -3,9 +3,15 @@
 #include <string.h>
 
 //#define PROMPTALPH
-#define PROMPTREMOVE
+//#define PROMPTREMOVE
 
-// bkcn<kbjadbjcanj nad for a linked list node
+typedef struct ELM {
+    char *key;
+    struct ELM *next;
+} LinkedWord;
+typedef LinkedWord *ListWord;
+
+// Linked list node
 typedef struct EL {
     int n;
     struct EL *next;
@@ -74,10 +80,25 @@ typedef struct tree_node {
 } tree_node;
 typedef tree_node *tree;
 
-int k;          // lenght of the words
-int e = 0;      // Number of eligibles words
-int emax = 0;   // Number of elements in the tree
-int match = 0;  // Number of the match in progress
+int k;            // lenght of the words
+int e = 0;        // Number of eligibles words
+int emax = 0;     // Number of elements in the tree
+int match = 0;    // Number of the match in progress
+tree_node *TNIL;  // T.nil
+
+// Head insert in a LinkedWord list
+void add_excluded(ListWord *l, char *key) {
+    ListWord new = (ListWord)malloc(sizeof(LinkedWord));
+    new->key = key;
+    new->next = *l;
+    *l = new;
+}
+// Remove head of a LinkedWord list
+void decapitate(ListWord *l) {
+    ListWord aux = *l;
+    *l = (*l)->next;
+    free(aux);
+}
 
 // Insert a new node  in the list ordered, void and without duplicates
 void order_insert(List *l, int n) {
@@ -281,14 +302,14 @@ void max_heapify(Word *a, int n, int i) {
     int l = 2 * i + 1;
     int r = 2 * i + 2;
     int largest;
-    if (l < n && (a->w[l] > a->w[i] || (a->w[l] == a->w[i] && a->pos[l] > a->pos[i]))) {
+    if (l < n && (a->w[l] > a->w[i] || (a->w[l] == a->w[i] && a->pos[l] > a->pos[i])))
         largest = l;
-    } else {
+    else
         largest = i;
-    }
-    if (r < n && (a->w[r] > a->w[largest] || (a->w[r] == a->w[largest] && a->pos[r] > a->pos[largest]))) {
+
+    if (r < n && (a->w[r] > a->w[largest] || (a->w[r] == a->w[largest] && a->pos[r] > a->pos[largest])))
         largest = r;
-    }
+
     if (largest != i) {
         swap(a, i, largest);
         max_heapify(a, n, largest);
@@ -357,7 +378,24 @@ void qs_mod(Word *a, int p, int r) {
         qs_mod(a, q + 1, r);
     }
 }
-
+// Returns the number of black nodes in a subtree of the given node
+// or -1 if it is not a red black tree.
+int computeBlackHeight(tree_node *currNode) {
+    // For an empty subtree the answer is obvious
+    if (currNode == NULL)
+        return 0;
+    // Computes the height for the left and right child recursively
+    int leftHeight = computeBlackHeight(currNode->left);
+    int rightHeight = computeBlackHeight(currNode->right);
+    int add = currNode->color == BLACK ? 1 : 0;
+    // The current subtree is not a red black tree if and only if
+    // one or more of current node's children is a root of an invalid tree
+    // or they contain different number of black nodes on a path to a null node.
+    if (leftHeight == -1 || rightHeight == -1 || leftHeight != rightHeight)
+        return -1;
+    else
+        return leftHeight + add;
+}
 // Red-black tree insert
 void rb_insert_fixup(tree *t, tree_node *z) {
     tree_node *x, *y;
@@ -410,8 +448,6 @@ void rb_insert(tree *t, char *key) {
     tree_node *z = (tree)malloc(sizeof(tree_node));
     z->key = key;
     z->used = 0;
-    e++;
-    emax++;
 #ifdef PROMPTREMOVE
     // printf("Inserting %s (e=%d)\n", key, e);
 #endif
@@ -435,6 +471,146 @@ void rb_insert(tree *t, char *key) {
         y->right = z;
     }
     rb_insert_fixup(t, z);
+}
+tree_node *rb_minimum(tree_node *x) {
+    while (x->left != NULL) {
+        x = x->left;
+    }
+    return x;
+}
+tree_node *rb_successor(tree_node *x) {
+    tree_node *y;
+    if (x->right != NULL) {
+        return rb_minimum(x->right);
+    }
+    y = x->parent;
+    while (y != NULL && x == y->right) {
+        x = y;
+        y = y->parent;
+    }
+    return y;
+}
+void rb_delete_fixup(tree *t, tree_node *x, tree_node *backUp) {
+    tree_node *w;
+    if (x != NULL && (x->color == RED || x->parent == NULL))
+        x->color = BLACK;
+    else if (x == NULL) {
+        w = backUp->right;
+        if (w != NULL && w->color == RED) {
+            w->color = BLACK;
+            backUp->color = RED;
+            left_rotate(t, backUp);
+            w = backUp->right;
+        }
+        if (w == NULL)
+            rb_delete_fixup(t, backUp, NULL);
+        else if ((w->right == NULL || w->right->color == BLACK) && (w->left == NULL || w->left->color == BLACK)) {
+            w->color = RED;
+            rb_delete_fixup(t, backUp, NULL);
+        } else {
+            if (w->right == NULL || w->right->color == BLACK) {
+                w->left->color = BLACK;
+                w->color = RED;
+                right_rotate(t, w);
+                w = backUp->right;
+            }
+            w->color = backUp->color;
+            backUp->color = BLACK;
+            if (w->right != NULL)
+                w->right->color = BLACK;
+            left_rotate(t, backUp);
+        }
+    } else if (x == x->parent->left) {
+        w = x->parent->right;
+        if (w != NULL && w->color == RED) {
+            w->color = BLACK;
+            x->parent->color = RED;
+            left_rotate(t, x->parent);
+            w = x->parent->right;
+        }
+        if (w == NULL)
+            rb_delete_fixup(t, x->parent, NULL);
+        else if ((w->right == NULL || w->right->color == BLACK) && (w->left == NULL || w->left->color == BLACK)) {
+            w->color = RED;
+            rb_delete_fixup(t, x->parent, NULL);
+        } else {
+            if (w->right == NULL || w->right->color == BLACK) {
+                if (w->left != NULL) w->left->color = BLACK;
+                w->color = RED;
+                right_rotate(t, w);
+                w = x->parent->right;
+            }
+            w->color = x->parent->color;
+            x->parent->color = BLACK;
+            if (w->right != NULL) w->right->color = BLACK;
+            left_rotate(t, x->parent);
+            x = *t;
+        }
+    } else {
+        w = x->parent->left;
+        if (w != NULL && w->color == RED) {
+            w->color = BLACK;
+            x->parent->color = RED;
+            right_rotate(t, x->parent);
+            w = x->parent->left;
+        }
+        if (w == NULL)
+            rb_delete_fixup(t, x->parent, NULL);
+        else if ((w->right == NULL || w->right->color == BLACK) && (w->left == NULL || w->left->color == BLACK)) {
+            w->color = RED;
+            rb_delete_fixup(t, x->parent, NULL);
+        } else {
+            if (w->left == NULL || w->left->color == BLACK) {
+                if (w->right != NULL) w->right->color = BLACK;
+                w->color = RED;
+                left_rotate(t, w);
+                w = x->parent->left;
+            }
+            w->color = x->parent->color;
+            x->parent->color = BLACK;
+            if (w->left != NULL) w->left->color = BLACK;
+            right_rotate(t, x->parent);
+            x = *t;
+        }
+    }
+}
+void rb_delete(tree_node *z) {
+    tree_node *t = z;  // Root of the tree
+    char f;
+    while (t->parent != NULL) t = t->parent;
+    tree_node *y, *x;
+    if (z->left == NULL || z->right == NULL)
+        y = z;
+    else
+        y = rb_successor(z);
+    if (y->parent != NULL && y == y->parent->right) {
+        f = 'r';
+        f++;
+        --f;
+    } else {
+        f = 'l';
+        f++;
+        --f;
+    }
+    if (y->left != NULL)
+        x = y->left;
+    else
+        x = y->right;
+    if (x != NULL)
+        x->parent = y->parent;
+    if (y->parent == NULL)
+        t = x;
+    else if (y == y->parent->left)
+        y->parent->left = x;
+    else
+        y->parent->right = x;
+    if (y != z) {
+        z->key = y->key;
+        z->used = y->used;
+    }
+    if (y->color == BLACK) {
+        rb_delete_fixup(&t, x, y->parent);
+    }
 }
 
 // BST Alph
@@ -525,12 +701,13 @@ void ignoreLine() {
     return;
 }
 
-void exclude(tree_node *t) {
+void exclude(tree_node *t, tree *l) {
     e--;
-    t->used = match;
+    rb_insert(l, t->key);
+    rb_delete(t);
     return;
 }
-void fillEligibles(tree *t, Alph f) {
+void fillEligibles(tree *t, Alph f, tree *l) {
     Filter *x = f == NULL ? NULL : bst_minimum(f);
     do {
     next:;
@@ -540,7 +717,7 @@ void fillEligibles(tree *t, Alph f) {
         if (c != '+') {
             if (fgets(i, k + 1, stdin) == NULL) break;
             getchar();
-            rb_insert(t, i);
+            emax++;
             if (f != NULL) {
                 // We need to check the filter for i
                 int app[64] = {0};
@@ -548,7 +725,7 @@ void fillEligibles(tree *t, Alph f) {
                 for (Filter *j = x; j != NULL; j = bst_successor(j)) {
                     if (j->memb == 1 && app[h(j->c)] != 0) {
                         // The char appears but it should not
-                        exclude(rb_search(*t, i));
+                        rb_insert(l, i);
 #ifdef PROMPTREMOVE
                         printf("Removing %s because the char %c appears but it should not\n", i, j->c);
 #endif
@@ -556,7 +733,7 @@ void fillEligibles(tree *t, Alph f) {
                     } else if (j->memb == 0) {
                         if (app[h(j->c)] == 0) {
                             // The char does not appear but it should
-                            exclude(rb_search(*t, i));
+                            rb_insert(l, i);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because the char %c does not appear but it should\n", i, j->c);
 #endif
@@ -564,14 +741,14 @@ void fillEligibles(tree *t, Alph f) {
                         }
                         if (j->exactApp != -1 && app[h(j->c)] != j->exactApp) {
                             // The char does not appear the exact number of times it should
-                            exclude(rb_search(*t, i));
+                            rb_insert(l, i);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because the char %c does not appear the exactly %d times but %d\n", i, j->c, j->exactApp, app[h(j->c)]);
 #endif
                             goto next;
                         } else if (j->exactApp == -1 && app[h(j->c)] < j->minApp) {
                             // The char does not appear the minimum number of times it should
-                            exclude(rb_search(*t, i));
+                            rb_insert(l, i);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because the char %c does not appear at least %d times but %d\n", i, j->c, j->minApp, app[h(j->c)]);
 #endif
@@ -580,7 +757,7 @@ void fillEligibles(tree *t, Alph f) {
                         for (Positions aux = j->pos; aux != NULL; aux = aux->next) {
                             if (aux->f == 0 && i[aux->n] == j->c) {
                                 // The char appear in a forbidden position
-                                exclude(rb_search(*t, i));
+                                rb_insert(l, i);
 #ifdef PROMPTREMOVE
                                 printf("Removing %s because the char %c appears in the forbidden position %d\n", i, j->c, aux->n);
 #endif
@@ -588,7 +765,7 @@ void fillEligibles(tree *t, Alph f) {
                             }
                             if (aux->f == 1 && i[aux->n] != j->c) {
                                 // The char does not appear in an mandatory position
-                                exclude(rb_search(*t, i));
+                                rb_insert(l, i);
 #ifdef PROMPTREMOVE
                                 printf("Removing %s because the char %c does not appear in the mandatory position %d\n", i, j->c, aux->n);
 #endif
@@ -598,6 +775,8 @@ void fillEligibles(tree *t, Alph f) {
                     }
                 }
             }
+            rb_insert(t, i);
+            e++;
 
         } else {
             free(i);
@@ -610,21 +789,20 @@ void getApp(int *arr, char *str) {
     for (int i = 0; i < k; i++) arr[h(str[i])]++;
 }
 
-void excludeOthers(tree t, Check f) {
+void excludeOthers(tree t, Check f, tree *l) {
     if (t != NULL) {
-        excludeOthers(t->left, f);
-        excludeOthers(t->right, f);
+        excludeOthers(t->left, f, l);
+        excludeOthers(t->right, f, l);
         if (t->used < match) {
             int app[64] = {0};
             getApp(app, t->key);
-            // for (int i = 0; i < k; i++) app[h(t->key[i])]++;
             for (Check i = f; i != NULL; i = i->next) {
                 int pos = h(i->c);
                 switch (i->type) {
                     case 0:
                         if (i->value == 1 && app[pos] != 0) {
                             // The char is present in the word but it should not be
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should not appear\n", t->key, i->c);
 #endif
@@ -632,7 +810,7 @@ void excludeOthers(tree t, Check f) {
                         }
                         if (i->value == 0 && app[pos] == 0) {
                             // The char is not present in the word but it should be
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should appear\n", t->key, i->c);
 #endif
@@ -642,7 +820,7 @@ void excludeOthers(tree t, Check f) {
                     case 1:
                         if (t->key[i->value] != i->c) {
                             // The char is not in a mandatory position
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should be in position %d, instead there is %c\n", t->key, i->c, i->value, t->key[i->value]);
 #endif
@@ -652,7 +830,7 @@ void excludeOthers(tree t, Check f) {
                     case 2:
                         if (t->key[i->value] == i->c) {
                             // The char is in a forbidden position
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should not be in position %d\n", t->key, i->c, i->value);
 #endif
@@ -662,7 +840,7 @@ void excludeOthers(tree t, Check f) {
                     case 3:
                         if (app[pos] < i->value) {
                             // The char does not appear enough times
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
@@ -672,7 +850,7 @@ void excludeOthers(tree t, Check f) {
                     case 4:
                         if (app[pos] != i->value) {
                             // The char does not appear the exact number of times
-                            exclude(t);
+                            exclude(t, l);
 #ifdef PROMPTREMOVE
                             printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
@@ -744,10 +922,21 @@ void freeCheck(Check c) {
     }
 }
 
+void mergeTrees(tree dest, tree src) {
+    if (src != NULL) {
+        mergeTrees(dest, src->left);
+        mergeTrees(dest, src->right);
+        rb_insert(&dest, src->key);
+        // free(src->key);
+        free(src);
+    }
+}
+
 void play(int max, char *ref, tree *elig) {
-    int attempts = 0;      // Number of attempts done until now
-    int flag = 1;          // If the word must be compared or not
-    Alph alphabet = NULL;  // Tree of filters, one for each character
+    int attempts = 0;       // Number of attempts done until now
+    int flag = 1;           // If the word must be compared or not
+    Alph alphabet = NULL;   // Tree of filters, one for each character
+    tree surelyNot = NULL;  // Tree of words that cannot be the solution
 #ifdef PROMPTALPH
     FILE *fpalphabet = fopen("debug/alphabet.txt", "a");
     fprintf(fpalphabet, "\n\n==============\nPartita numero %d: ref %s\n==============\n\n", match, ref);
@@ -768,7 +957,7 @@ void play(int max, char *ref, tree *elig) {
                 if (c == 'i') {
                     // +inserisci_inizio
                     ignoreLine();
-                    fillEligibles(elig, alphabet);
+                    fillEligibles(elig, alphabet, &surelyNot);
                     ignoreLine();
                 } else if (c == 's') {
                     // +stampa_filtrate
@@ -804,15 +993,16 @@ void play(int max, char *ref, tree *elig) {
                 getchar();
 
                 tree_node *node = rb_search(*elig, unWord);
+                if (node == NULL) {
+                    node = rb_search(surelyNot, unWord);
+                } else {
+                    exclude(node, &surelyNot);
+                }
 
                 if (node == NULL) {
                     printf("not_exists\n");
                 } else {
                     counter = 0;
-                    if (node->used < match) {
-                        node->used = match;
-                        e--;
-                    }
 
                     attempts++;
 
@@ -946,7 +1136,7 @@ void play(int max, char *ref, tree *elig) {
                             }
                         } while (hw < k && hr < k && orderRef[hr] != '~' && ordWord.w[hw] != '~');
                         printf("%s\n", output);
-                        excludeOthers(*elig, newToCheck);
+                        excludeOthers(*elig, newToCheck, &surelyNot);
 #ifndef PROMPTALPH
                         freeCheck(newToCheck);
 #endif
@@ -1009,6 +1199,7 @@ void play(int max, char *ref, tree *elig) {
     } while (flag);
     // Free dynamically allocated memory
     freeAlphabet(alphabet);
+    mergeTrees(*elig, surelyNot);
 #ifdef PROMPTALPH
     fclose(fpalphabet);
 #endif
@@ -1017,11 +1208,13 @@ void play(int max, char *ref, tree *elig) {
 
 int main(int argc, char const *argv[]) {
     tree eligibiles = NULL;
+
     if (scanf("%d\n", &k) == EOF) return -1;
     char *ref = (char *)malloc(sizeof(char) * (k + 1));  // Reference word
     int max;                                             // Maximum number of attempts allowed
 
-    fillEligibles(&eligibiles, NULL);
+    fillEligibles(&eligibiles, NULL, NULL);
+
 #ifdef PROMPTALPH
     FILE *fpalphabet = fopen("debug/alphabet.txt", "w");
     fprintf(fpalphabet, "Alphabet file\n");
@@ -1044,7 +1237,7 @@ int main(int argc, char const *argv[]) {
                 break;
             case 'i':
                 // +inserisci_inizio
-                fillEligibles(&eligibiles, NULL);
+                fillEligibles(&eligibiles, NULL, NULL);
                 ignoreLine();
                 break;
             default:
