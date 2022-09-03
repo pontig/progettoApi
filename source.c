@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PROMPTALPH
-#define PROMPTREMOVE
+//#define PROMPTALPH
+//#define PROMPTREMOVE
+//#define PROMPTREPLACE
 
 // =======================================================
 // TYPE DEFINITION
@@ -25,7 +26,7 @@ typedef struct {
     struct N *root;
 } rb_tree;
 
-// bst_treeabet bst_node, bst
+// Alphabet:  bst_node, bst
 typedef struct FM {
     int n;  // Position
     int f;  // Flag: 1 for mandatory, 0 for forbidden
@@ -65,6 +66,12 @@ typedef struct T {
     struct T *next;
 } Three;
 typedef Three *Check;
+
+// Linked list of words
+typedef struct L {
+    char *key;
+    struct L *next;
+} linked_element;
 
 // =======================================================
 // GLOBAL VARIABLES
@@ -164,7 +171,7 @@ rb_node *rb_successor(rb_node *x) {
         return rb_minimum(x->right);
     }
     rb_node *y = x->parent;
-    while (y != NULL && x == y->right) {
+    while (y != Tnil && x == y->right) {
         x = y;
         y = y->parent;
     }
@@ -348,6 +355,7 @@ void rb_delete(rb_tree *t, rb_node *z) {
     if (y_original_color == BLACK) {
         rb_delete_fixup(t, x);
     }
+    free(z->key);
     free(z);
     return;
 }
@@ -611,6 +619,25 @@ void new_info_insert(Check *l, char c, int type, int value) {
     }
 }
 
+// Head insert and remove from the list of linked elements
+void list_head_insert(linked_element **l, char *s) {
+    linked_element *new = (linked_element *)malloc(sizeof(linked_element));
+    new->key = s;
+    new->next = NULL;
+    if (*l == NULL) {
+        *l = new;
+    } else {
+        new->next = *l;
+        *l = new;
+    }
+}
+void list_head_remove(linked_element **l) {
+    if (*l == NULL) return;
+    linked_element *aux = *l;
+    *l = (*l)->next;
+    free(aux);
+}
+
 // =======================================================
 // ENDING FUNCTIONS
 // =======================================================
@@ -632,15 +659,13 @@ void freeCheck(Check l) {
     return;
 }
 
-void merge_trees(rb_tree final, rb_node *source) {
-    if (source != Tnil) {
-        merge_trees(final, source->left);
-        merge_trees(final, source->right);
-        rb_insert(&final, source->key);
-        free(source->key);
-        free(source);
+void freeRBtree(rb_node *x) {
+    if (x != Tnil) {
+        freeRBtree(x->left);
+        freeRBtree(x->right);
+        free(x->key);
+        free(x);
     }
-    return;
 }
 
 void resetEligibiles() {
@@ -653,9 +678,26 @@ void resetEligibiles() {
         source = eligibiles;
         destination = forbidden;
     }
-    merge_trees(destination, source.root);
+    // merge_trees(destination, source.root);
+    if (eligibiles.root == Tnil) {
+        eligibiles.root = forbidden.root;
+    } else {
+        rb_node *i = rb_minimum(source.root);
+        // rb_node *prec;
+        while (i != Tnil) {
+            rb_insert(&destination, i->key);
+#ifdef PROMPTREPLACE
+            printf("Re-inserting %s\n", i->key);
+#endif
+            // prec = i;
+            i = rb_successor(i);
+            // free(prec->key);
+            // free(prec);
+        }
+        freeRBtree(source.root);
+        eligibiles.root = destination.root;
+    }
 
-    eligibiles = destination;
     forbidden.root = Tnil;
 }
 
@@ -683,7 +725,7 @@ void fillEligibiles() {
                 getApp(app, toAdd);
                 int flag = 1;  // If we can move on the next char in the bst
                 for (bst_node *i = min; i != NULL; i = bst_successor(i)) {
-                    if (i->memb == 1 && app[h(i->c) != 0]) {
+                    if (i->memb == 1 && app[h(i->c)] != 0) {
                         // The char appears but it shouldn't
                         flag = 0;
 #ifdef PROMPTREMOVE
@@ -752,6 +794,8 @@ void fillEligibiles() {
 
 void excludeOthers(rb_node *t, Check c) {
     rb_node *j = rb_minimum(t);
+    linked_element *forbiddenList = NULL, *aux;
+
 nw:;
     while (j != Tnil) {
         int app[64] = {0};
@@ -823,13 +867,11 @@ nw:;
 
             if (!flag) {
                 // The word is not valid
-                // rb_insert(&forbidden, t->key);
-                // rb_delete(&eligibiles, rb_search(&eligibiles, t->key));
-
                 rb_node *prec = j;
                 j = rb_successor(j);
                 rb_insert(&forbidden, prec->key);
-                rb_delete(&eligibiles, prec);
+                //rb_delete(&eligibiles, prec);
+                list_head_insert(&forbiddenList, prec->key);
                 e--;
                 // return;
 
@@ -837,9 +879,17 @@ nw:;
             }
         }
         // The word is valid
-        // return;
         j = rb_successor(j);
     }
+
+while (forbiddenList != NULL) {
+        aux = forbiddenList;
+        forbiddenList = forbiddenList->next;
+        rb_delete(&eligibiles, rb_search(&eligibiles, aux->key));
+        free(aux);
+    }
+
+    return;
 }
 
 void play(int max, char *ref) {
@@ -962,6 +1012,7 @@ void play(int max, char *ref) {
 
                     if (counter == k) {
                         printf("ok\n");
+                        freeAlphabet(alphabet);
                         goto exit;
                     }
 
@@ -1105,12 +1156,12 @@ void play(int max, char *ref) {
             }
         }
     } while (1);
+    freeAlphabet(alphabet);
 exit:;
     free(tildes);
     free(output);
     free(input.c);
     free(input.pos);
-    freeAlphabet(alphabet);
     resetEligibiles();
 
 #ifdef PROMPTALPH
@@ -1163,5 +1214,9 @@ int main(int argc, char const *argv[]) {
         }
         flag = getchar();
     }
+
+    //freeRBtree(eligibiles.root);
+    //freeRBtree(forbidden.root);
+
     return 0;
 }
