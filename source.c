@@ -19,7 +19,7 @@ typedef enum {
 typedef struct N {
     struct N *left, *right, *parent;
     rb_color color;
-    char *key;
+    char key[];
 } rb_node;
 
 typedef struct {
@@ -77,14 +77,15 @@ typedef struct L {
 // GLOBAL VARIABLES
 // =======================================================
 
-int k;               // Length of the words
-int e;               // Number of eligible words remaining
-int emax;            // Maximum number of eligible words
-rb_node *Tnil;       // Nil node
-bst_tree alphabet;   // Tree of filters
-rb_tree eligibiles;  // Tree of eligible words
-rb_tree forbidden;   // Tree of forbidden words
-char *toAdd;         // The word to add
+int k;                  // Length of the words
+int e;                  // Number of eligible words remaining
+int emax;               // Maximum number of eligible words
+rb_node *Tnil;          // Nil node
+bst_tree alphabet;      // Tree of filters
+rb_tree eligibiles;     // Tree of eligible words
+rb_tree forbidden;      // Tree of forbidden words
+char *toAdd;            // The word to add
+int ASCII[256] = {-1};  // ASCII table
 
 // =======================================================
 // RED BLACK TREE FUNCTIONS
@@ -236,9 +237,15 @@ void rb_insert_fixup(rb_tree *t, rb_node *z) {
     }
 }
 void rb_insert(rb_tree *t, char *key) {
-    rb_node *z = malloc(sizeof(rb_node) /* + (k + 1) * sizeof(char) */);
-    z->key = (char *)malloc(sizeof(char) * (k + 1));
-    strcpy(z->key, key);
+    rb_node *z = malloc(sizeof(rb_node) + (k + 1) * sizeof(char));
+    // z->key = (char *)malloc(sizeof(char) * (k + 1));
+
+    // for (int i = 0; i < k; i++) {
+    //     z->key[i] = key[i];
+    // }
+    // z->key[k] = '\0';
+
+    strcpy(&(z->key[0]), key);
     z->left = Tnil;
     z->right = Tnil;
     z->parent = NULL;
@@ -355,7 +362,7 @@ void rb_delete(rb_tree *t, rb_node *z) {
     if (y_original_color == BLACK) {
         rb_delete_fixup(t, x);
     }
-    free(z->key);
+    // free(z->key);
     free(z);
     return;
 }
@@ -600,7 +607,7 @@ void ignoreLine() {
 // Get the appearance of every character in a string
 void getApp(int *a, char *str) {
     for (int i = 0; i < k; i++) {
-        a[h(str[i])]++;
+        a[ASCII[(unsigned char)str[i]]]++;
     }
 }
 
@@ -663,7 +670,7 @@ void freeRBtree(rb_node *x) {
     if (x != Tnil) {
         freeRBtree(x->left);
         freeRBtree(x->right);
-        free(x->key);
+        // free(x->key);
         free(x);
     }
 }
@@ -725,7 +732,7 @@ void fillEligibiles() {
                 getApp(app, toAdd);
                 int flag = 1;  // If we can move on the next char in the bst
                 for (bst_node *i = min; i != NULL; i = bst_successor(i)) {
-                    int pos = h(i->c);
+                    int pos = ASCII[(unsigned char)i->c];
                     if (i->memb == 1 && app[pos] != 0) {
                         // The char appears but it shouldn't
                         flag = 0;
@@ -774,13 +781,13 @@ void fillEligibiles() {
                             }
                         }
                     }
-                    if (flag) {
-                        // We can move on the next char in the bst
-                    } else {
+                    if (!flag) {
                         // The word is not eligibile
                         rb_insert(&forbidden, toAdd);
                         break;
                     }
+
+                    // Else we can move on the next char in the bst
                 }
                 if (flag) {
                     // The word is eligibile
@@ -803,7 +810,7 @@ nw:;
         int flag = 1;  // If we can move on the next char in the check
 
         for (Check i = c; i != NULL; i = i->next) {
-            int pos = h(i->c);
+            int pos = ASCII[(unsigned char)i->c];
             switch (i->type) {
                 case 0:
                     if (i->value == 1 && app[pos] != 0) {
@@ -962,7 +969,7 @@ void play(int max, char *ref) {
                         if (input.c[i] == ref[i]) {
                             // Right char in right position
                             bst_node *alreadyKnow = bst_search(&alphabet, input.c[i]);
-                            int posOfI = h(input.c[i]);
+                            int posOfI = ASCII[(unsigned char)input.c[i]];
                             output[i] = '+';
                             counter++;
                             minApps[posOfI]++;
@@ -1010,7 +1017,7 @@ void play(int max, char *ref) {
                     sortChar(tildes);
 
                     do {
-                        int posOfHi = h(input.c[hi]);
+                        int posOfHi = ASCII[(unsigned char)input.c[hi]];
                         if (hr < k - counter && input.c[hi] > tildes[hr] /* || tildes[hr] == '~' */)
                             hr++;
 
@@ -1071,9 +1078,8 @@ void play(int max, char *ref) {
                                     bst_insert(&alphabet, new);
                                     // The only thing that we have to check about this char is that it shouldn't appear at all
                                     new_info_insert(&newInfo, input.c[hi], 0, 1);
-                                } else {
-                                    // We already knew that, we don't have to do anything
                                 }
+                                // Els we already knew that, we don't have to do anything
                             } else {
                                 // It has appeared too many times
                                 // alreadyKnow should not be NULL
@@ -1162,6 +1168,11 @@ exit:;
 }
 
 int main(int argc, char const *argv[]) {
+    // Fill ASCII table
+    for (int i = 0; i < 128; i++) {
+        ASCII[(unsigned char)i] = h(i);
+    }
+
     generate_nil();
     eligibiles.root = Tnil;
     forbidden.root = Tnil;
