@@ -25134,8 +25134,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -25250,8 +25250,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -25381,8 +25381,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -25526,8 +25526,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -25687,8 +25687,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -25814,8 +25814,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -1
+Positions: 3M, 
 
 
 Character X:
@@ -25859,8 +25859,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -26005,8 +26005,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -1
+Positions: 3M, 
 
 
 Character X:
@@ -26055,8 +26055,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -26211,8 +26211,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -1
+Positions: 3M, 
 
 
 Character X:
@@ -26261,8 +26261,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -26414,8 +26414,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -1
+Positions: 3M, 
 
 
 Character X:
@@ -26464,8 +26464,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -26626,8 +26626,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -2
+Positions: 1F, 3M, 4F, 
 
 
 Character X:
@@ -26676,8 +26676,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -26836,8 +26836,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -2
+Positions: 1F, 3M, 4F, 
 
 
 Character X:
@@ -26886,8 +26886,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:
@@ -27056,8 +27056,8 @@ Character V:
 
 
 Character W:
-	not member
-
+app: -2
+Positions: 1F, 3M, 4F, 
 
 
 Character X:
@@ -27106,8 +27106,8 @@ Character l:
 
 
 Character n:
-	not member
-
+app: 1
+Positions: 1M, 2F, 
 
 
 Character o:

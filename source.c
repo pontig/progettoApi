@@ -725,30 +725,31 @@ void fillEligibiles() {
                 getApp(app, toAdd);
                 int flag = 1;  // If we can move on the next char in the bst
                 for (bst_node *i = min; i != NULL; i = bst_successor(i)) {
-                    if (i->memb == 1 && app[h(i->c)] != 0) {
+                    int pos = h(i->c);
+                    if (i->memb == 1 && app[pos] != 0) {
                         // The char appears but it shouldn't
                         flag = 0;
 #ifdef PROMPTREMOVE
                         printf("Removing %s because the char %c appears but it should not\n", toAdd, i->c);
 #endif
                     } else if (i->memb == 0) {
-                        if (app[h(i->c)] == 0) {
+                        if (app[pos] == 0) {
                             // The char doesn't appear but it should
                             flag = 0;
 #ifdef PROMPTREMOVE
                             printf("Removing %s because the char %c does not appear but it should\n", toAdd, i->c);
 #endif
-                        } else if (i->app < 0 && (-1 * app[h(i->c)]) > i->app) {
+                        } else if (i->app < 0 && (-1 * app[pos]) > i->app) {
                             // The char does not appear the minimum number of times
                             flag = 0;
 #ifdef PROMPTREMOVE
-                            printf("Removing %s because the char %c does not appear the exactly %d times but %d\n", toAdd, i->c, -1 * i->app, app[h(i->c)]);
+                            printf("Removing %s because the char %c does not appear the exactly %d times but %d\n", toAdd, i->c, -1 * i->app, app[pos]);
 #endif
-                        } else if (i->app > 0 && app[h(i->c)] != i->app) {
+                        } else if (i->app > 0 && app[pos] != i->app) {
                             // The char does no appear the exact number of times
                             flag = 0;
 #ifdef PROMPTREMOVE
-                            printf("Removing %s because the char %c does not appear at least %d times but %d\n", toAdd, i->c, i->app, app[h(i->c)]);
+                            printf("Removing %s because the char %c does not appear at least %d times but %d\n", toAdd, i->c, i->app, app[pos]);
 #endif
                         }
                         if (flag) {
@@ -794,7 +795,6 @@ void fillEligibiles() {
 
 void excludeOthers(rb_node *t, Check c) {
     rb_node *j = rb_minimum(t);
-    linked_element *forbiddenList = NULL, *aux;
 
 nw:;
     while (j != Tnil) {
@@ -870,23 +870,13 @@ nw:;
                 rb_node *prec = j;
                 j = rb_successor(j);
                 rb_insert(&forbidden, prec->key);
-                //rb_delete(&eligibiles, prec);
-                list_head_insert(&forbiddenList, prec->key);
+                rb_delete(&eligibiles, prec);
                 e--;
-                // return;
-
                 goto nw;
             }
         }
         // The word is valid
         j = rb_successor(j);
-    }
-
-while (forbiddenList != NULL) {
-        aux = forbiddenList;
-        forbiddenList = forbiddenList->next;
-        rb_delete(&eligibiles, rb_search(&eligibiles, aux->key));
-        free(aux);
     }
 
     return;
@@ -1215,8 +1205,8 @@ int main(int argc, char const *argv[]) {
         flag = getchar();
     }
 
-    //freeRBtree(eligibiles.root);
-    //freeRBtree(forbidden.root);
+    // freeRBtree(eligibiles.root);
+    // freeRBtree(forbidden.root);
 
     return 0;
 }
