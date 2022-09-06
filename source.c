@@ -236,14 +236,38 @@ void rb_insert_fixup(rb_tree *t, rb_node *z) {
         }
     }
 }
+void rb_insert_node(rb_tree *t, rb_node *z) {
+    z->left = Tnil;
+    z->right = Tnil;
+    z->color = RED;
+    z->parent = NULL;
+
+    rb_node *y = t->root;
+    rb_node *x = t->root;
+
+    while (x != Tnil) {
+        y = x;
+        if (strcmp(x->key, z->key) < 0) {
+            x = x->right;
+        } else {
+            x = x->left;
+        }
+    }
+
+    z->parent = y;
+    if (y == Tnil) {
+        t->root = z;
+    } else if (strcmp(y->key, z->key) < 0) {
+        y->right = z;
+    } else {
+        y->left = z;
+    }
+    rb_insert_fixup(t, z);
+
+    return;
+}
 void rb_insert(rb_tree *t, char *key) {
     rb_node *z = malloc(sizeof(rb_node) + (k + 1) * sizeof(char));
-    // z->key = (char *)malloc(sizeof(char) * (k + 1));
-
-    // for (int i = 0; i < k; i++) {
-    //     z->key[i] = key[i];
-    // }
-    // z->key[k] = '\0';
 
     strcpy(&(z->key[0]), key);
     z->left = Tnil;
@@ -332,7 +356,7 @@ void rb_delete_fixup(rb_tree *t, rb_node *z) {
     z->color = BLACK;
     return;
 }
-void rb_delete(rb_tree *t, rb_node *z) {
+void rb_delete(rb_tree *t, rb_node *z, rb_tree *dest) {
     rb_node *x;
     rb_node *y = z;
     rb_color y_original_color = y->color;
@@ -363,7 +387,7 @@ void rb_delete(rb_tree *t, rb_node *z) {
         rb_delete_fixup(t, x);
     }
     // free(z->key);
-    free(z);
+    rb_insert_node(dest, z);
     return;
 }
 
@@ -690,18 +714,19 @@ void resetEligibiles() {
         eligibiles.root = forbidden.root;
     } else {
         rb_node *i = rb_minimum(source.root);
-        // rb_node *prec;
+        rb_node *prec;
         while (i != Tnil) {
-            rb_insert(&destination, i->key);
+            // rb_insert(&destination, i->key);
 #ifdef PROMPTREPLACE
             printf("Re-inserting %s\n", i->key);
 #endif
-            // prec = i;
+            prec = i;
             i = rb_successor(i);
+            rb_delete(&source, prec, &destination);
             // free(prec->key);
             // free(prec);
         }
-        freeRBtree(source.root);
+        // freeRBtree(source.root);
         eligibiles.root = destination.root;
     }
 
@@ -876,8 +901,8 @@ nw:;
                 // The word is not valid
                 rb_node *prec = j;
                 j = rb_successor(j);
-                rb_insert(&forbidden, prec->key);
-                rb_delete(&eligibiles, prec);
+                // rb_insert(&forbidden, prec->key);
+                rb_delete(&eligibiles, prec, &forbidden);
                 e--;
                 goto nw;
             }
@@ -950,8 +975,8 @@ void play(int max, char *ref) {
                     node = rb_search(&forbidden, input.c);
                 } else {
                     e--;
-                    rb_delete(&eligibiles, node);
-                    rb_insert(&forbidden, input.c);
+                    rb_delete(&eligibiles, node, &forbidden);
+                    // rb_insert(&forbidden, input.c);
                 }
 
                 if (node == NULL) {
