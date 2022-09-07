@@ -51,7 +51,7 @@ typedef struct T {
     char c;     // The char
     int type;   /* Type of the information:
                 0 - membership
-                1 - mandatory position
+                1 - mandatory pposition
                 2 - forbidden position
                 3 - minimum number of appearances
                 4 - exact number of appearances
@@ -74,20 +74,6 @@ rb_tree eligibiles;     // Tree of eligible words
 rb_tree forbidden;      // Tree of forbidden words
 char *toAdd;            // The word to add
 int ASCII[256] = {-1};  // ASCII table
-
-// =======================================================
-// STRINGS
-// =======================================================
-
-int my_strcmp(char *w1, char *w2) {
-    int i = 0;
-    int diff = 0;
-    while (diff == 0 && i < k) {
-        diff = w1[i] - w2[i];
-        ++i;
-    }
-    return diff;
-}
 
 // =======================================================
 // RED BLACK TREE FUNCTIONS
@@ -249,7 +235,7 @@ void rb_insert_node(rb_tree *t, rb_node *z) {
 
     while (x != Tnil) {
         y = x;
-        if (my_strcmp(x->key, z->key) < 0) {
+        if (strcmp(x->key, z->key) < 0) {
             x = x->right;
         } else {
             x = x->left;
@@ -259,7 +245,7 @@ void rb_insert_node(rb_tree *t, rb_node *z) {
     z->parent = y;
     if (y == Tnil) {
         t->root = z;
-    } else if (my_strcmp(y->key, z->key) < 0) {
+    } else if (strcmp(y->key, z->key) < 0) {
         y->right = z;
     } else {
         y->left = z;
@@ -282,7 +268,7 @@ void rb_insert(rb_tree *t, char *key) {
 
     while (x != Tnil) {
         y = x;
-        if (my_strcmp(x->key, key) < 0) {
+        if (strcmp(x->key, key) < 0) {
             x = x->right;
         } else {
             x = x->left;
@@ -292,7 +278,7 @@ void rb_insert(rb_tree *t, char *key) {
     z->parent = y;
     if (y == Tnil) {
         t->root = z;
-    } else if (my_strcmp(y->key, key) < 0) {
+    } else if (strcmp(y->key, key) < 0) {
         y->right = z;
     } else {
         y->left = z;
@@ -724,12 +710,11 @@ void fillEligibiles() {
 }
 
 void excludeOthers(rb_node *t, Check c) {
-    rb_node *j = rb_minimum(t);
-
-nw:;
-    while (j != Tnil) {
+    if (t != Tnil) {
+        excludeOthers(t->left, c);
+        excludeOthers(t->right, c);
         int app[64] = {0};
-        getApp(app, j->key);
+        getApp(app, t->key);
         int flag = 1;  // If we can move on the next char in the check
 
         for (Check i = c; i != NULL; i = i->next) {
@@ -740,33 +725,33 @@ nw:;
                         // The char is present in the word but it should not be
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should not appear\n", j->key, i->c);
+                        printf("Removing %s because %c should not appear\n", t->key, i->c);
 #endif
                     } else if (i->value == 0 && app[pos] == 0) {
                         // The char is not present in the word but it should be
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear\n", j->key, i->c);
+                        printf("Removing %s because %c should appear\n", t->key, i->c);
 #endif
                     }
                     break;
 
                 case 1:
-                    if (j->key[i->value] != i->c) {
+                    if (t->key[i->value] != i->c) {
                         // The char is not in a mandatory position
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should be in position %d, instead there is %c\n", j->key, i->c, i->value, t->key[i->value]);
+                        printf("Removing %s because %c should be in position %d, instead there is %c\n", t->key, i->c, i->value, t->key[i->value]);
 #endif
                     }
                     break;
 
                 case 2:
-                    if (j->key[i->value] == i->c) {
+                    if (t->key[i->value] == i->c) {
                         // The char is in a forbidden position
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should not be in position %d\n", j->key, i->c, i->value);
+                        printf("Removing %s because %c should not be in position %d\n", t->key, i->c, i->value);
 #endif
                     }
                     break;
@@ -776,7 +761,7 @@ nw:;
                         // The char does not appear enough times
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", j->key, i->c, i->value, app[pos]);
+                        printf("Removing %s because %c should appear at least %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                     }
                     break;
@@ -786,7 +771,7 @@ nw:;
                         // The char does not appear the exact number of times
                         flag = 0;
 #ifdef PROMPTREMOVE
-                        printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", j->key, i->c, i->value, app[pos]);
+                        printf("Removing %s because %c should appear exactly %d times, instead it appears %d times\n", t->key, i->c, i->value, app[pos]);
 #endif
                     }
                     break;
@@ -797,18 +782,16 @@ nw:;
 
             if (!flag) {
                 // The word is not valid
-                rb_node *prec = j;
-                j = rb_successor(j);
-                rb_delete(&eligibiles, prec, &forbidden);
+                //rb_node *prec = j;
+                //j = rb_successor(j);
+                rb_delete(&eligibiles, t, &forbidden);
                 e--;
-                goto nw;
+                goto halo;
             }
         }
         // The word is valid
-        j = rb_successor(j);
+        halo:;
     }
-
-    return;
 }
 
 void play(int max, char *ref) {
@@ -819,11 +802,15 @@ void play(int max, char *ref) {
 
     int attempts = 0;  // Number of attempts done until now
     char *input;       // The input word, read every time from stdin
+    // char *orderRef = (char *)malloc(sizeof(char) * (k + 1));  // Reference word in ascii order
     char *output = (char *)malloc(sizeof(char) * (k + 1));  // Output string
+    char *tildes = (char *)malloc(sizeof(char) * (k + 1));  // Reference word to edit
     int tempFlag;                                           // Meh
     int refApps[64] = {0};                                  // Chars apprearances in the ref word
     getApp(refApps, ref);
 
+    // strcpy(orderRef, ref);
+    // sortChar(orderRef);
     output[k] = '\0';
     input = (char *)malloc(sizeof(char) * (k + 1));
 #ifdef PROMPTALPH
@@ -866,6 +853,10 @@ void play(int max, char *ref) {
 
                 if (node == NULL) {
                     node = rb_search(&forbidden, input);
+                } else {
+                    e--;
+                    rb_delete(&eligibiles, node, &forbidden);
+                    // rb_insert(&forbidden, input);
                 }
 
                 if (node == NULL) {
@@ -1041,6 +1032,7 @@ void play(int max, char *ref) {
     } while (1);
     freeAlphabet(alphabet);
 exit:;
+    free(tildes);
     free(output);
     free(input);
     resetEligibiles();
