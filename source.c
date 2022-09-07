@@ -93,15 +93,6 @@ int my_strcmp(char *w1, char *w2) {
 // RED BLACK TREE FUNCTIONS
 // =======================================================
 
-void generate_nil() {
-    Tnil = malloc(sizeof(rb_node));
-    Tnil->left = NULL;
-    Tnil->right = NULL;
-    Tnil->parent = NULL;
-    Tnil->color = BLACK;
-    return;
-}
-
 void inorder(rb_node *root) {
     if (root != Tnil) {
         inorder(root->left);
@@ -238,36 +229,7 @@ void rb_insert_fixup(rb_tree *t, rb_node *z) {
         }
     }
 }
-void rb_insert_node(rb_tree *t, rb_node *z) {
-    z->left = Tnil;
-    z->right = Tnil;
-    z->color = RED;
-    z->parent = NULL;
 
-    rb_node *y = t->root;
-    rb_node *x = t->root;
-
-    while (x != Tnil) {
-        y = x;
-        if (my_strcmp(x->key, z->key) < 0) {
-            x = x->right;
-        } else {
-            x = x->left;
-        }
-    }
-
-    z->parent = y;
-    if (y == Tnil) {
-        t->root = z;
-    } else if (my_strcmp(y->key, z->key) < 0) {
-        y->right = z;
-    } else {
-        y->left = z;
-    }
-    rb_insert_fixup(t, z);
-
-    return;
-}
 void rb_insert(rb_tree *t, char *key) {
     rb_node *z = malloc(sizeof(rb_node) + (k + 1) * sizeof(char));
 
@@ -388,8 +350,34 @@ void rb_delete(rb_tree *t, rb_node *z, rb_tree *dest) {
     if (y_original_color == BLACK) {
         rb_delete_fixup(t, x);
     }
-    // free(z->key);
-    rb_insert_node(dest, z);
+    z->left = Tnil;
+    z->right = Tnil;
+    z->color = RED;
+    z->parent = NULL;
+
+    y = dest->root;
+    x = dest->root;
+
+    while (x != Tnil) {
+        y = x;
+        if (my_strcmp(x->key, z->key) < 0) {
+            x = x->right;
+        } else {
+            x = x->left;
+        }
+    }
+
+    z->parent = y;
+    if (y == Tnil) {
+        dest->root = z;
+    } else if (my_strcmp(y->key, z->key) < 0) {
+        y->right = z;
+    } else {
+        y->left = z;
+    }
+    rb_insert_fixup(dest, z);
+
+    return;
     return;
 }
 
@@ -614,17 +602,13 @@ void resetEligibiles() {
         rb_node *i = rb_minimum(source.root);
         rb_node *prec;
         while (i != Tnil) {
-            // rb_insert(&destination, i->key);
 #ifdef PROMPTREPLACE
             printf("Re-inserting %s\n", i->key);
 #endif
             prec = i;
             i = rb_successor(i);
             rb_delete(&source, prec, &destination);
-            // free(prec->key);
-            // free(prec);
         }
-        // freeRBtree(source.root);
         eligibiles.root = destination.root;
     }
 
@@ -817,8 +801,8 @@ void play(int max, char *ref) {
     fprintf(fpalphabet, "\n\n==============\nPartita ref %s\n==============\n\n", ref);
 #endif
 
-    int attempts = 0;  // Number of attempts done until now
-    char *input;       // The input word, read every time from stdin
+    int attempts = 0;                                       // Number of attempts done until now
+    char *input;                                            // The input word, read every time from stdin
     char *output = (char *)malloc(sizeof(char) * (k + 1));  // Output string
     int tempFlag;                                           // Meh
     int refApps[64] = {0};                                  // Chars apprearances in the ref word
@@ -1058,7 +1042,13 @@ int main(int argc, char const *argv[]) {
         ASCII[(unsigned char)i] = h(i);
     }
 
-    generate_nil();
+    // Generate Tnil
+    Tnil = malloc(sizeof(rb_node));
+    Tnil->left = NULL;
+    Tnil->right = NULL;
+    Tnil->parent = NULL;
+    Tnil->color = BLACK;
+
     eligibiles.root = Tnil;
     forbidden.root = Tnil;
 
