@@ -20,7 +20,7 @@ typedef struct N {
     struct N *left, *right, *parent;
     rb_color color;
     char key[];
-} rb_node;
+} __attribute__((packed)) rb_node;
 
 typedef struct {
     struct N *root;
@@ -74,6 +74,7 @@ rb_tree eligibiles;     // Tree of eligible words
 rb_tree forbidden;      // Tree of forbidden words
 char *toAdd;            // The word to add
 int ASCII[256] = {-1};  // ASCII table
+rb_node *residue = NULL;
 
 // =======================================================
 // STRINGS
@@ -105,10 +106,11 @@ void inorder(rb_node *root) {
 rb_node *rb_search(rb_tree *t, char *key) {
     rb_node *x = t->root;
     while (x != Tnil) {
-        if (strcmp(x->key, key) == 0) {
+        int com = strcmp(x->key, key);
+        if (com == 0) {
             return x;
         }
-        if (strcmp(x->key, key) < 0) {
+        if (com < 0) {
             x = x->right;
         } else {
             x = x->left;
@@ -350,6 +352,7 @@ void rb_delete(rb_tree *t, rb_node *z, rb_tree *dest) {
     if (y_original_color == BLACK) {
         rb_delete_fixup(t, x);
     }
+
     z->left = Tnil;
     z->right = Tnil;
     z->color = RED;
@@ -357,6 +360,20 @@ void rb_delete(rb_tree *t, rb_node *z, rb_tree *dest) {
 
     y = dest->root;
     x = dest->root;
+
+    if (residue != NULL) {
+        int velocissima = 1;
+        x = residue;
+        while (x != dest->root) {
+            if (velocissima && x == x->parent->right)
+                x = x->parent;
+            else if (my_strcmp(x->parent->key, z->key) < 0) {
+                x = x->parent;
+                velocissima = 0;
+            } else
+                break;
+        }
+    }
 
     while (x != Tnil) {
         y = x;
@@ -377,7 +394,7 @@ void rb_delete(rb_tree *t, rb_node *z, rb_tree *dest) {
     }
     rb_insert_fixup(dest, z);
 
-    return;
+    residue = z;
     return;
 }
 
@@ -709,6 +726,7 @@ void fillEligibiles() {
 
 void excludeOthers(rb_node *t, Check c) {
     rb_node *j = rb_minimum(t);
+    residue = NULL;
 
 nw:;
     while (j != Tnil) {
@@ -791,7 +809,7 @@ nw:;
         // The word is valid
         j = rb_successor(j);
     }
-
+    residue = NULL;
     return;
 }
 
