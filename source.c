@@ -11,8 +11,21 @@ typedef enum {
     BLACK
 } rb_color;
 
-typedef struct Node {
-    struct Node *left, *right, *parent;
+typedef struct BSNode {
+    struct BSNode *left, *right, *father;
+    int autonomy;
+    int numberOfCars;
+} bs_node;
+
+typedef bs_node *bs_tree;
+
+typedef struct {
+    int max;
+    bs_tree cars;
+} Parking;
+
+typedef struct RBNode {
+    struct RBNode *left, *right, *parent;
     rb_color color;
     int key;
     Parking *parking;
@@ -22,11 +35,6 @@ typedef struct {
     rb_node *root;
 } rb_tree;
 
-typedef struct {
-    int max;
-    
-} Parking;
-
 // =======================================================
 // Global variables
 // =======================================================
@@ -35,13 +43,21 @@ rb_node *Tnil;
 rb_tree stations;
 
 // =======================================================
-// RED BLACK TREE FUNCTIONS
+// Red Bkack Tree functions
 // =======================================================
+
+void free_parking(bs_tree p) {
+    if (p != NULL) {
+        free_parking(p->left);
+        free_parking(p->right);
+        free(p);
+    }
+}
 
 void inorder(rb_node *root) {
     if (root != Tnil) {
         inorder(root->left);
-        printf("%s\n", root->key);
+        printf("%u\n", root->key);
         inorder(root->right);
     }
     return;
@@ -299,7 +315,107 @@ void rb_delete(rb_tree *t, rb_node *z) {
     if (y_original_color == BLACK) {
         rb_delete_fixup(t, x);
     }
+
+    free_parking(z->parking->cars);
+    free(z->parking);
+    free(z);
     return;
+}
+
+// =======================================================
+// BSTs function
+// =======================================================
+
+bs_node *bs_search(bs_tree t, int autonomy) {
+    if (t == NULL || t->autonomy == autonomy) return t;
+    if (t->autonomy < autonomy)
+        return bs_search(t->right, autonomy);
+    else
+        return bs_search(t->left, autonomy);
+}
+
+bs_node *bs_minimum(bs_tree a) {
+    bs_node *x = a;
+    if (a == NULL) {
+        return NULL;
+    }
+
+    while (x->left != NULL) {
+        x = x->left;
+    }
+    return x;
+}
+bs_node *bs_successor(bs_tree a) {
+    bs_node *x = a;
+    if (x->right != NULL) {
+        return bs_minimum(x->right);
+    }
+    bs_node *y = x->father;
+    while (y != NULL && x == y->right) {
+        x = y;
+        y = y->father;
+    }
+    return y;
+}
+
+void bs_insert(bs_tree *t, int autonomy) {
+    bs_node *y = NULL;
+    bs_node *x = *t;
+
+    while (x != NULL) {
+        y = x;
+        if (autonomy < x->autonomy) {
+            x = x->left;
+        } else if (autonomy > x->autonomy) {
+            x = x->right;
+        } else {
+            // this car is already present
+            x->numberOfCars++;
+            return;
+        }
+    }
+
+    bs_node *z = malloc(sizeof(bs_node));
+    z->autonomy = autonomy;
+    z->numberOfCars = 1;
+    z->father = y;
+    if (y == NULL) {
+        *t = z;
+    } else if (z->autonomy < y->autonomy) {
+        y->left = z;
+    } else {
+        y->right = z;
+    }
+}
+
+void bs_delete(bs_tree *t, bs_node *z) {
+    bs_node *y, *x;
+
+    if (z->left == NULL || z->right == NULL)
+        y = z;
+     else 
+        y = bs_successor(z);
+    
+    if (y->left != NULL) {
+        x = y->left;
+    } else {
+        x = y->right;
+    }
+    if (x != NULL) {
+        x->father = y->father;
+    }
+    if (y->father == NULL) {
+        *t = x;
+    } else if (y == y->father->left) {
+        y->father->left = x;
+    } else {
+        y->father->right = x;
+    }
+    if (y != z) {
+        z->autonomy = y->autonomy;
+    }
+
+    free(y);
 }
 
 // =======================================================
@@ -314,14 +430,52 @@ void ignoreLine() {
     return;
 }
 
-void new_car(rb_node *station, int autonomy) {
-    
+int remove_car(rb_node *station, int autonomy) {
+    bs_node *car = station->parking->cars;
+    while (car != NULL) {
+        if (car->autonomy == autonomy)
+            break;
+        else if (car->autonomy < autonomy)
+            car = car->right;
+        else
+            car = car->left;
+    }
+
+    if (car == NULL) return 0;
+    if (car->numberOfCars > 1) {
+        --(car->numberOfCars);
+    } else {
+        bs_delete(&(station->parking->cars), car);
+    }
+
+    return 1;
+}
+
+// Returns the number of black nodes in a subtree of the given node
+// or -1 if it is not a red black tree.
+int computeBlackHeight(rb_node *currNode) {
+    // For an empty subtree the answer is obvious
+    if (currNode == Tnil)
+        return 0;
+    // Computes the height for the left and right child recursively
+    int leftHeight = computeBlackHeight(currNode->left);
+    int rightHeight = computeBlackHeight(currNode->right);
+    int add = currNode->color == BLACK ? 1 : 0;
+    // The current subtree is not a red black tree if and only if
+    // one or more of current node's children is a root of an invalid tree
+    // or they contain different number of black nodes on a path to a null node.
+    if (leftHeight == -1 || rightHeight == -1 || leftHeight != rightHeight)
+        return -1;
+    else
+        return leftHeight + add;
 }
 
 int main(int argc, char const *argv[]) {
     unsigned int tmpInt;  // Temporary integer to use as fast as possible
-    rb_node *tmpNode;     // Node that olds the node of the new station, to be used to fill the cars
+    rb_node *tmpNode;     // RBNode that olds the node of the new station, to be used to fill the cars
     int i;                // Iterator
+    char tmpBuff[20];     // The buffer to put the ignored lines
+    int line = 0;         // Line of the input
 
     // Generate Tnil
     Tnil = malloc(sizeof(rb_node));
@@ -333,40 +487,36 @@ int main(int argc, char const *argv[]) {
     stations.root = Tnil;
 
     for (char char_input = getchar(); char_input != EOF; char_input = getchar()) {
+        line++;
         switch (char_input) {
             case 'a':
-                getchar();  // g
-                getchar();  // g
-                getchar();  // i
-                getchar();  // u
-                getchar();  // n
-                getchar();  // g
-                getchar();  // i
-                getchar();  // -
+                fgets(tmpBuff, 9, stdin);
 
                 char what = getchar();
                 getchar();  // space
                 switch (what) {
                     case 's':
-                        getchar();  // t
-                        getchar();  // a
-                        getchar();  // z
-                        getchar();  // i
-                        getchar();  // o
-                        getchar();  // n
-                        getchar();  // e
-                        getchar();  // space
+
+                        fgets(tmpBuff, 8, stdin);
                         scanf("%u ", &tmpInt);
                         tmpNode = rb_insert(&stations, tmpInt);
                         if (tmpNode == NULL) {
                             printf("non aggiunta");
                             ignoreLine();
                         } else {
-                            scanf("%u", &tmpInt);
-                            for (i = 0; i < tmpInt; i++) {
-                                scanf(" %u", &tmpInt);
-                                new_car(tmpNode, tmpInt);
+                            int numCars;
+                            scanf("%u", &numCars);
+                            if (numCars != 0) {
+                                tmpNode->parking = malloc(sizeof(Parking));
+                                tmpNode->parking->max = 0;
                             }
+                            for (i = 0; i < numCars; i++) {
+                                scanf(" %u", &tmpInt);
+                                if (tmpInt > tmpNode->parking->max)
+                                    tmpNode->parking->max = tmpInt;
+                                bs_insert(&(tmpNode->parking->cars), tmpInt);
+                            }
+                            printf("aggiunta\n");
                             getchar();  // \n
                         }
                         break;
@@ -375,7 +525,22 @@ int main(int argc, char const *argv[]) {
                         getchar();  // u
                         getchar();  // t
                         getchar();  // o
-                        getchar();  // space
+                        scanf("%u ", &tmpInt);
+                        tmpNode = rb_search(&stations, tmpInt);
+                        if (tmpNode == NULL) {
+                            printf("non aggiunta\n");
+                            ignoreLine();
+                        } else {
+                            if (tmpNode->parking == NULL) {
+                                tmpNode->parking = malloc(sizeof(Parking));
+                                tmpNode->parking->max = 0;
+                            }
+                            scanf("%u\n", &tmpInt);
+                            if (tmpInt > tmpNode->parking->max)
+                                tmpNode->parking->max = tmpInt;
+                            bs_insert(&(tmpNode->parking->cars), tmpInt);
+                            printf("aggiunta\n");
+                        }
                         break;
 
                     default:
@@ -383,7 +548,38 @@ int main(int argc, char const *argv[]) {
                 }
                 break;
 
+            case 'd':
+                fgets(tmpBuff, 18, stdin);  // emolisci-stazione [space]
+                scanf("%u\n", &tmpInt);
+                tmpNode = rb_search(&stations, tmpInt);
+                if (tmpNode == NULL)
+                    printf("non demolita\n");
+                else {
+                    rb_delete(&stations, tmpNode);
+                    printf("demolita\n");
+                }
+                break;
+
+            case 'r':
+                fgets(tmpBuff, 12, stdin);  // ottama-auto [space]
+                scanf("%u ", &tmpInt);
+                tmpNode = rb_search(&stations, tmpInt);
+                if (tmpNode == NULL) {
+                    printf("non rottamata\n");
+                    ignoreLine();
+                } else {
+                    scanf("%u\n", &tmpInt);
+                    tmpInt = remove_car(tmpNode, tmpInt);
+                    if (tmpInt)
+                        printf("rottamata\n");
+                    else
+                        printf("non rottamata\n");
+                }
+                break;
+
             default:
+                ignoreLine();
+                printf("Test inserimenti\n");
                 break;
         }
     }
