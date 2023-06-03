@@ -319,6 +319,8 @@ void rb_delete(rb_tree *t, rb_node *z) {
     free_parking(z->parking->cars);
     free(z->parking);
     free(z);
+    z->parking = NULL;
+    z = NULL;
     return;
 }
 
@@ -358,9 +360,9 @@ bs_node *bs_successor(bs_tree a) {
     return y;
 }
 
-void bs_insert(bs_tree *t, int autonomy) {
+void bs_insert(bs_tree t, int autonomy) {
     bs_node *y = NULL;
-    bs_node *x = *t;
+    bs_node *x = t;
 
     while (x != NULL) {
         y = x;
@@ -380,7 +382,7 @@ void bs_insert(bs_tree *t, int autonomy) {
     z->numberOfCars = 1;
     z->father = y;
     if (y == NULL) {
-        *t = z;
+        t = z;
     } else if (z->autonomy < y->autonomy) {
         y->left = z;
     } else {
@@ -393,9 +395,9 @@ void bs_delete(bs_tree *t, bs_node *z) {
 
     if (z->left == NULL || z->right == NULL)
         y = z;
-     else 
+    else
         y = bs_successor(z);
-    
+
     if (y->left != NULL) {
         x = y->left;
     } else {
@@ -431,6 +433,7 @@ void ignoreLine() {
 }
 
 int remove_car(rb_node *station, int autonomy) {
+    // TODO: puntatori di merda
     bs_node *car = station->parking->cars;
     while (car != NULL) {
         if (car->autonomy == autonomy)
@@ -501,7 +504,7 @@ int main(int argc, char const *argv[]) {
                         scanf("%u ", &tmpInt);
                         tmpNode = rb_insert(&stations, tmpInt);
                         if (tmpNode == NULL) {
-                            printf("non aggiunta");
+                            printf("non aggiunta\n");
                             ignoreLine();
                         } else {
                             int numCars;
@@ -514,7 +517,7 @@ int main(int argc, char const *argv[]) {
                                 scanf(" %u", &tmpInt);
                                 if (tmpInt > tmpNode->parking->max)
                                     tmpNode->parking->max = tmpInt;
-                                bs_insert(&(tmpNode->parking->cars), tmpInt);
+                                bs_insert(tmpNode->parking->cars, tmpInt);
                             }
                             printf("aggiunta\n");
                             getchar();  // \n
@@ -538,7 +541,7 @@ int main(int argc, char const *argv[]) {
                             scanf("%u\n", &tmpInt);
                             if (tmpInt > tmpNode->parking->max)
                                 tmpNode->parking->max = tmpInt;
-                            bs_insert(&(tmpNode->parking->cars), tmpInt);
+                            bs_insert(tmpNode->parking->cars, tmpInt);
                             printf("aggiunta\n");
                         }
                         break;
