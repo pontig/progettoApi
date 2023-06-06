@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DEBUG
+
 // =======================================================
 // Type definitions
 // =======================================================
@@ -34,7 +36,6 @@ typedef struct {
     little_rb_tree *cars;
 } Parking;
 
-
 typedef struct RBNode {
     struct RBNode *left, *right, *parent;
     rb_color color;
@@ -46,14 +47,23 @@ typedef struct {
     rb_node *root;
 } rb_tree;
 
+typedef struct LList {
+    struct LList *next;
+    int key;
+} l_list;
+
+typedef l_list *L_List;
 
 // =======================================================
 // Global variables
 // =======================================================
 
 rb_node *Tnil;
-little_rb_node * little_Tnil;
+little_rb_node *little_Tnil;
 rb_tree stations;
+int eligibleNumberOfStages;
+l_list *eligible;
+int line = 0;  // Line of the input
 
 // =======================================================
 // Red Bkack Tree functions
@@ -70,7 +80,7 @@ void free_parking(bs_tree p) {
 void inorder(rb_node *root) {
     if (root != Tnil) {
         inorder(root->left);
-        printf("%u\n", root->key);
+        printf("%u, auto: %d\n", root->key, root->parking->max);
         inorder(root->right);
     }
     return;
@@ -329,14 +339,13 @@ void rb_delete(rb_tree *t, rb_node *z) {
         rb_delete_fixup(t, x);
     }
 
-    //free_parking(z->parking->cars);
+    // free_parking(z->parking->cars);
     free(z->parking);
     free(z);
     z->parking = NULL;
     z = NULL;
     return;
 }
-
 
 // =======================================================
 // Little red-black tree functions
@@ -419,6 +428,12 @@ little_rb_node *little_rb_successor(little_rb_node *x) {
         y = y->parent;
     }
     return y;
+}
+little_rb_node *little_rb_maximum(little_rb_node *x) {
+    while (x->right != little_Tnil) {
+        x = x->right;
+    }
+    return x;
 }
 
 void little_rb_transplant(little_rb_tree *t, little_rb_node *u, little_rb_node *v) {
@@ -717,7 +732,6 @@ void ignoreLine() {
 }
 
 int remove_car(rb_node *station, int autonomy) {
-
     little_rb_node *car = station->parking->cars->root;
     while (car != little_Tnil) {
         if (car->autonomy == autonomy)
@@ -732,6 +746,9 @@ int remove_car(rb_node *station, int autonomy) {
     if (car->numberOfCars > 1) {
         --(car->numberOfCars);
     } else {
+        if (car->autonomy == station->parking->max) {
+            station->parking->max = little_rb_maximum(station->parking->cars->root)->autonomy;
+        }
         little_rb_delete(station->parking->cars, car);
     }
 
@@ -757,8 +774,8 @@ int computeBlackHeight(rb_node *currNode) {
         return leftHeight + add;
 }
 
-void printbst(bs_node *n, int prof) {
-    if (n == NULL) {
+void printbst(little_rb_node *n, int prof) {
+    if (n == little_Tnil) {
         printf("NULL");
         return;
     }
@@ -778,12 +795,118 @@ void printbst(bs_node *n, int prof) {
     printbst(n->right, prof + 1);
 }
 
+void new_car(little_rb_tree *t, int autonomy) {
+    little_rb_node *y = little_rb_search(t, autonomy);
+    if (y != NULL) {
+        y->numberOfCars++;
+    } else {
+        little_rb_insert(t, autonomy);
+    }
+}
+
+void print_list(l_list *l) {
+    if (l != NULL) {
+        printf("%d ", l->key);
+        print_list(l->next);
+    }
+}
+
+void l_list_insert(L_List *l, int key) {
+    l_list *new = malloc(sizeof(l_list));
+    new->key = key;
+    new->next = *l;
+    *l = new;
+}
+
+void free_list(L_List p) {
+    if (p == NULL) return;
+    L_List next = p->next;  // Store the reference to the next node
+    free(p);                // Free the current node
+    free_list(next);        // Recursively free the rest of the list
+}
+
+l_list *compute_path(rb_node *start, rb_node *finish, L_List *path) {
+    rb_node *curr;
+    for (curr = start; curr != Tnil && curr != finish; curr = rb_successor(curr)) {
+        if (curr->key + curr->parking->max >= finish->key) {
+            l_list_insert(path, curr->key);
+            if (curr == start)
+                return *path;
+            return compute_path(start, curr, path);
+        }
+    }
+    if (curr == finish)
+        return NULL;
+    else
+        return *path;
+}
+
+l_list *old_compute_path(rb_node *start, rb_node *finish, int numberOfStages, l_list *path) {
+    int foundSomething = 0;
+    rb_node *curr;
+    if (eligibleNumberOfStages != -1 && numberOfStages >= eligibleNumberOfStages) {
+// We are out of the range
+// free(path);
+#ifdef DEBUG
+        printf("out of range, current steps: %d [line %d]\n", eligibleNumberOfStages, line);
+#endif
+        return NULL;
+    }
+
+    for (curr = rb_successor(start); curr != NULL && curr->key <= start->key + start->parking->max; curr = rb_successor(curr)) {
+// Base case(s)
+#ifdef DEBUG
+        printf("analyzing from %d to %d\n", start->key, curr->key);
+#endif
+        if (curr == finish) {
+            if (eligibleNumberOfStages == -1 || /*shouldn't be necessary*/ numberOfStages + 1 < eligibleNumberOfStages) {
+                // This is a good path
+                eligibleNumberOfStages = numberOfStages + 1;
+                eligible = path;
+                return path;
+            } else {
+                //  Backpropagate the fact that this is not the way to go
+                return NULL;
+            }
+        } else {
+            // TODO: could put directly the node?
+            // I have in hand a node that is not the finish, but it is reachable
+
+            l_list *nextStage = malloc(sizeof(l_list));
+            nextStage->key = curr->key;
+            nextStage->next = path;
+            l_list *notSure = old_compute_path(curr, finish, numberOfStages + 1, nextStage);
+
+            if (notSure == NULL) {
+                // There is no path from here to the end
+                free(nextStage);
+            } else {
+                foundSomething = 1;
+            }
+        }
+    }
+
+    if (foundSomething)
+        return path;
+    else {
+        // free(path);
+        return NULL;
+    }
+}
+
+void print_situa() {
+    printf("La situazione auto è questa:\n");
+    rb_node *curr = stations.root;
+    inorder(curr);
+}
+
 int main(int argc, char const *argv[]) {
     unsigned int tmpInt;  // Temporary integer to use as fast as possible
     rb_node *tmpNode;     // RBNode that olds the node of the new station, to be used to fill the cars
     int i;                // Iterator
     char tmpBuff[20];     // The buffer to put the ignored lines
-    int line = 0;         // Line of the input
+
+    int start, finish;  // The start and finish of the journey
 
     // Generate Tnil
     Tnil = malloc(sizeof(rb_node));
@@ -830,7 +953,7 @@ int main(int argc, char const *argv[]) {
                                 scanf(" %u", &tmpInt);
                                 if (tmpInt > tmpNode->parking->max)
                                     tmpNode->parking->max = tmpInt;
-                                little_rb_insert((tmpNode->parking->cars), tmpInt);
+                                new_car((tmpNode->parking->cars), tmpInt);
                             }
                             printf("aggiunta\n");
                             getchar();  // \n
@@ -852,12 +975,11 @@ int main(int argc, char const *argv[]) {
                                 tmpNode->parking->cars = malloc(sizeof(little_rb_tree));
                                 tmpNode->parking->cars->root = little_Tnil;
                                 tmpNode->parking->max = 0;
-                                tmpNode->parking->max = 0;
                             }
                             scanf("%u\n", &tmpInt);
                             if (tmpInt > tmpNode->parking->max)
                                 tmpNode->parking->max = tmpInt;
-                            little_rb_insert((tmpNode->parking->cars), tmpInt);
+                            new_car((tmpNode->parking->cars), tmpInt);
                             printf("aggiunta\n");
                         }
                         break;
@@ -896,12 +1018,40 @@ int main(int argc, char const *argv[]) {
                 }
                 break;
 
+            case 'p':
+                fgets(tmpBuff, 18, stdin);  // ianifica-percorso [space]
+                scanf("%u %u\n", &start, &finish);
+                if (start != finish) {
+                    eligible = NULL;
+                    eligibleNumberOfStages = -1;
+                    rb_node *startNode = rb_search(&stations, start);
+                    rb_node *finishNode = rb_search(&stations, finish);
+                    L_List path = NULL;
+                    if (start < finish)
+                        path = compute_path(startNode, finishNode, &path);
+                        // TODO: liberare la memoria e fare il percorso al contrario
+                    else
+                        path = NULL;
+                    if (path == NULL) {
+                        {
+                            printf("nessun percorso\n");
+                        }
+                    } else {
+                        // printf("%d ", start);
+                        print_list(path);
+                        printf("%d\n", finish);
+                    }
+                } else {
+                    printf("%u\n", start);
+                    break;
+                }
+                break;
+
             default:
                 ignoreLine();
                 printf("Test inserimenti\n");
                 break;
         }
     }
-
     return 0;
 }
