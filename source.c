@@ -145,12 +145,29 @@ rb_node *rb_minimum(rb_node *x) {
     }
     return x;
 }
+rb_node *rb_maximum(rb_node *x) {
+    while (x->right != Tnil) {
+        x = x->right;
+    }
+    return x;
+}
 rb_node *rb_successor(rb_node *x) {
     if (x->right != Tnil) {
         return rb_minimum(x->right);
     }
     rb_node *y = x->parent;
     while (y != Tnil && x == y->right) {
+        x = y;
+        y = y->parent;
+    }
+    return y;
+}
+rb_node *rb_predecessor(rb_node *x) {
+    if (x->left != Tnil) {
+        return rb_maximum(x->left);
+    }
+    rb_node *y = x->parent;
+    while (y != Tnil && x == y->left) {
         x = y;
         y = y->parent;
     }
@@ -841,6 +858,10 @@ l_list *compute_path(rb_node *start, rb_node *finish, L_List *path) {
         return *path;
 }
 
+l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
+    
+}
+
 l_list *old_compute_path(rb_node *start, rb_node *finish, int numberOfStages, l_list *path) {
     int foundSomething = 0;
     rb_node *curr;
@@ -927,22 +948,22 @@ int main(int argc, char const *argv[]) {
         switch (char_input) {
             case 'a':
                 // aggiungi
-                fgets(tmpBuff, 9, stdin);
+                if (fgets(tmpBuff, 9, stdin) == NULL) return -1;
 
                 char what = getchar();
                 getchar();  // space
                 switch (what) {
                     case 's':
 
-                        fgets(tmpBuff, 8, stdin);
-                        scanf("%u ", &tmpInt);
+                        if (fgets(tmpBuff, 8, stdin) == NULL) return -1;
+                        if (scanf("%u ", &tmpInt) == EOF) return -1;
                         tmpNode = rb_insert(&stations, tmpInt);
                         if (tmpNode == NULL) {
                             printf("non aggiunta\n");
                             ignoreLine();
                         } else {
                             int numCars;
-                            scanf("%u", &numCars);
+                            if (scanf("%u", &numCars) == EOF) return -1;
                             if (numCars != 0) {
                                 tmpNode->parking = malloc(sizeof(Parking));
                                 tmpNode->parking->cars = malloc(sizeof(little_rb_tree));
@@ -950,7 +971,7 @@ int main(int argc, char const *argv[]) {
                                 tmpNode->parking->max = 0;
                             }
                             for (i = 0; i < numCars; i++) {
-                                scanf(" %u", &tmpInt);
+                                if (scanf(" %u", &tmpInt) == EOF) return -1;
                                 if (tmpInt > tmpNode->parking->max)
                                     tmpNode->parking->max = tmpInt;
                                 new_car((tmpNode->parking->cars), tmpInt);
@@ -964,7 +985,7 @@ int main(int argc, char const *argv[]) {
                         getchar();  // u
                         getchar();  // t
                         getchar();  // o
-                        scanf("%u ", &tmpInt);
+                        if (scanf("%u ", &tmpInt) == EOF) return -1;
                         tmpNode = rb_search(&stations, tmpInt);
                         if (tmpNode == NULL) {
                             printf("non aggiunta\n");
@@ -976,7 +997,7 @@ int main(int argc, char const *argv[]) {
                                 tmpNode->parking->cars->root = little_Tnil;
                                 tmpNode->parking->max = 0;
                             }
-                            scanf("%u\n", &tmpInt);
+                            if (scanf("%u\n", &tmpInt) == EOF) return -1;
                             if (tmpInt > tmpNode->parking->max)
                                 tmpNode->parking->max = tmpInt;
                             new_car((tmpNode->parking->cars), tmpInt);
@@ -990,8 +1011,8 @@ int main(int argc, char const *argv[]) {
                 break;
 
             case 'd':
-                fgets(tmpBuff, 18, stdin);  // emolisci-stazione [space]
-                scanf("%u\n", &tmpInt);
+                if (fgets(tmpBuff, 18, stdin) == NULL) return -1;  // emolisci-stazione [space]
+                if (scanf("%u\n", &tmpInt) == EOF) return -1;
                 tmpNode = rb_search(&stations, tmpInt);
                 if (tmpNode == NULL)
                     printf("non demolita\n");
@@ -1002,14 +1023,14 @@ int main(int argc, char const *argv[]) {
                 break;
 
             case 'r':
-                fgets(tmpBuff, 12, stdin);  // ottama-auto [space]
-                scanf("%u ", &tmpInt);
+                if (fgets(tmpBuff, 12, stdin) == NULL) return -1;  // ottama-auto [space]
+                if (scanf("%u ", &tmpInt) == EOF) return -1;
                 tmpNode = rb_search(&stations, tmpInt);
                 if (tmpNode == NULL) {
                     printf("non rottamata\n");
                     ignoreLine();
                 } else {
-                    scanf("%u\n", &tmpInt);
+                    if (scanf("%u\n", &tmpInt) == EOF) return -1;
                     tmpInt = remove_car(tmpNode, tmpInt);
                     if (tmpInt)
                         printf("rottamata\n");
@@ -1019,8 +1040,8 @@ int main(int argc, char const *argv[]) {
                 break;
 
             case 'p':
-                fgets(tmpBuff, 18, stdin);  // ianifica-percorso [space]
-                scanf("%u %u\n", &start, &finish);
+                if (fgets(tmpBuff, 18, stdin) == NULL) return -1;  // ianifica-percorso [space]
+                if (scanf("%u %u\n", &start, &finish) == EOF) return -1;
                 if (start != finish) {
                     eligible = NULL;
                     eligibleNumberOfStages = -1;
@@ -1029,9 +1050,8 @@ int main(int argc, char const *argv[]) {
                     L_List path = NULL;
                     if (start < finish)
                         path = compute_path(startNode, finishNode, &path);
-                        // TODO: liberare la memoria e fare il percorso al contrario
                     else
-                        path = NULL;
+                        path = rev_compute_path(startNode, finishNode, &path);
                     if (path == NULL) {
                         {
                             printf("nessun percorso\n");
@@ -1039,6 +1059,7 @@ int main(int argc, char const *argv[]) {
                     } else {
                         // printf("%d ", start);
                         print_list(path);
+                        free_list(path);
                         printf("%d\n", finish);
                     }
                 } else {
