@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DEBUG
+// #define DEBUG
+// #define PRINTSTEPS
+// #define PRINTLINE
 
 // =======================================================
 // Type definitions
@@ -40,6 +42,7 @@ typedef struct RBNode {
     struct RBNode *left, *right, *parent;
     rb_color color;
     int key;
+    int stepsToTheGoal;
     Parking *parking;
 } rb_node;
 
@@ -741,10 +744,10 @@ void bs_delete(bs_tree *t, bs_node *z) {
 // =======================================================
 
 void ignoreLine() {
-    char *line = NULL;
+    char *toIgnore = NULL;
     size_t len = 0;
-    if (getline(&line, &len, stdin) == -1) return;
-    free(line);
+    if (getline(&toIgnore, &len, stdin) == -1) return;
+    free(toIgnore);
     return;
 }
 
@@ -828,6 +831,13 @@ void print_list(l_list *l) {
     }
 }
 
+void print_rev_list(l_list *l) {
+    if (l != NULL) {
+        print_rev_list(l->next);
+        printf("%d ", l->key);
+    }
+}
+
 void l_list_insert(L_List *l, int key) {
     l_list *new = malloc(sizeof(l_list));
     new->key = key;
@@ -858,61 +868,56 @@ l_list *compute_path(rb_node *start, rb_node *finish, L_List *path) {
         return *path;
 }
 
-l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
-    
-}
-
-l_list *old_compute_path(rb_node *start, rb_node *finish, int numberOfStages, l_list *path) {
-    int foundSomething = 0;
-    rb_node *curr;
-    if (eligibleNumberOfStages != -1 && numberOfStages >= eligibleNumberOfStages) {
-// We are out of the range
-// free(path);
-#ifdef DEBUG
-        printf("out of range, current steps: %d [line %d]\n", eligibleNumberOfStages, line);
-#endif
-        return NULL;
+l_list *match_path(rb_node *start, rb_node *current, L_List *path) {
+    l_list *res = NULL;
+    if ((current->stepsToTheGoal == start->stepsToTheGoal - 1) && (start->key - start->parking->max <= current->key)) {
+        l_list_insert(path, start->key);
+        return *path;
     }
-
-    for (curr = rb_successor(start); curr != NULL && curr->key <= start->key + start->parking->max; curr = rb_successor(curr)) {
-// Base case(s)
-#ifdef DEBUG
-        printf("analyzing from %d to %d\n", start->key, curr->key);
-#endif
-        if (curr == finish) {
-            if (eligibleNumberOfStages == -1 || /*shouldn't be necessary*/ numberOfStages + 1 < eligibleNumberOfStages) {
-                // This is a good path
-                eligibleNumberOfStages = numberOfStages + 1;
-                eligible = path;
-                return path;
-            } else {
-                //  Backpropagate the fact that this is not the way to go
-                return NULL;
-            }
-        } else {
-            // TODO: could put directly the node?
-            // I have in hand a node that is not the finish, but it is reachable
-
-            l_list *nextStage = malloc(sizeof(l_list));
-            nextStage->key = curr->key;
-            nextStage->next = path;
-            l_list *notSure = old_compute_path(curr, finish, numberOfStages + 1, nextStage);
-
-            if (notSure == NULL) {
-                // There is no path from here to the end
-                free(nextStage);
-            } else {
-                foundSomething = 1;
+    for (rb_node *i = current; i != Tnil && i->stepsToTheGoal <= current->stepsToTheGoal + 1; i = rb_successor(i)) {
+        if (current->stepsToTheGoal == i->stepsToTheGoal -1) {
+            if (i->key - i->parking->max <= current->key) {
+                res = match_path(start, i, path);
+                if (res != NULL) {
+                    l_list_insert(path, i->key);
+                    return *path;
+                }
             }
         }
     }
+    return NULL;
+    // i think null should be returned here
+}
 
-    if (foundSomething)
-        return path;
-    else {
-        // free(path);
-        return NULL;
+l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
+    // 1: per ogni stazione dalla fine all'inizio segno quanti passi devo fare
+    rb_node *i, *j;
+    for (i = finish; i != Tnil && i->key <= start->key; i = rb_successor(i)) {
+        if (i == finish) {
+            i->stepsToTheGoal = 0;
+            continue;
+        }
+        i->stepsToTheGoal = -1;
+        for (j = i; j->key >= finish->key && j->key >= i->key - i->parking->max; j = rb_predecessor(j)) {
+            if (i != j && j->stepsToTheGoal != -1 && (i->stepsToTheGoal == -1 || j->stepsToTheGoal < i->stepsToTheGoal - 1)) {
+                i->stepsToTheGoal = j->stepsToTheGoal + 1;
+            }
+        }
+
+#ifdef PRINTSTEPS
+        printf("Node %d has %d steps, can reach %d\n", i->key, i->stepsToTheGoal, i->key - i->parking->max);
+#endif
     }
+#ifdef PRINTSTEPS
+    return NULL;
+#endif
+
+    if (start->stepsToTheGoal == -1)
+        // Nessun percorso
+        return NULL;
+
+    L_List res = match_path(start, finish, path);
+    return res;
 }
 
 void print_situa() {
@@ -945,6 +950,9 @@ int main(int argc, char const *argv[]) {
 
     for (char char_input = getchar(); char_input != EOF; char_input = getchar()) {
         line++;
+#ifdef PRINTLINE
+        printf("Reading line %d\n", line);
+#endif
         switch (char_input) {
             case 'a':
                 // aggiungi
@@ -1048,19 +1056,27 @@ int main(int argc, char const *argv[]) {
                     rb_node *startNode = rb_search(&stations, start);
                     rb_node *finishNode = rb_search(&stations, finish);
                     L_List path = NULL;
-                    if (start < finish)
+                    if (start < finish) {
                         path = compute_path(startNode, finishNode, &path);
-                    else
-                        path = rev_compute_path(startNode, finishNode, &path);
-                    if (path == NULL) {
-                        {
+                        if (path == NULL) {
                             printf("nessun percorso\n");
+                        } else {
+                            // printf("%d ", start);
+                            print_list(path);
+                            free_list(path);
+                            printf("%d\n", finish);
                         }
                     } else {
-                        // printf("%d ", start);
-                        print_list(path);
-                        free_list(path);
-                        printf("%d\n", finish);
+                        path = rev_compute_path(startNode, finishNode, &path);
+                        // path = NULL;
+                        if (path == NULL) {
+                            printf("nessun percorso\n");
+                        } else {
+                            // printf("%d ", start);
+                            print_rev_list(path);
+                            free_list(path);
+                            printf("%d\n", finish);
+                        }
                     }
                 } else {
                     printf("%u\n", start);
