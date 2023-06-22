@@ -875,7 +875,7 @@ l_list *match_path(rb_node *start, rb_node *current, L_List *path) {
         return *path;
     }
     for (rb_node *i = current; i != Tnil && i->stepsToTheGoal <= current->stepsToTheGoal + 1; i = rb_successor(i)) {
-        if (current->stepsToTheGoal == i->stepsToTheGoal -1) {
+        if (current->stepsToTheGoal == i->stepsToTheGoal - 1) {
             if (i->key - i->parking->max <= current->key) {
                 res = match_path(start, i, path);
                 if (res != NULL) {
