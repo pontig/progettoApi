@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 // #define DEBUG
-#define PRINTSTEPS
+ #define PRINTSTEPS
 // #define PRINTLINE
 
 // =======================================================
@@ -73,8 +73,8 @@ little_rb_node *little_Tnil;
 rb_tree stations;
 int eligibleNumberOfStages;
 l_list *eligible;
-int line = 0;      // Line of the input
-int *maxRaggiung;  // Per ogni step, il massimo raggiungibile
+int line = 0;       // Line of the input
+Pair *maxRaggiung;  // Per ogni step, il massimo raggiungibile
 int maxRaggiungLength;
 
 // =======================================================
@@ -924,7 +924,8 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
         if (i == finish) {
             i->stepsToTheGoal = 0;
             maxRaggiung = malloc(sizeof(int));
-            maxRaggiung[0] = -1;
+            maxRaggiung[0].max = -1;
+            maxRaggiung[0].key = finish->key;
             maxRaggiungLength = 0;
             continue;
         }
@@ -953,24 +954,26 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
         // Nessun percorso
         return NULL;
 
-    maxRaggiung = (int *)malloc(sizeof(int) * start->stepsToTheGoal + 1);
+    maxRaggiung = (Pair *)malloc(sizeof(Pair) * start->stepsToTheGoal + 1);
     for (int i = 0; i < start->stepsToTheGoal + 1; i++) {
-        maxRaggiung[i] = -1;
+        maxRaggiung[i].max = -1;
     }
-    maxRaggiung[start->stepsToTheGoal] = start->key - start->parking->max;
+    maxRaggiung[start->stepsToTheGoal].max = start->key - start->parking->max;
+    maxRaggiung[start->stepsToTheGoal].key = start->key;
     for (rb_node *i = start; i != finish; i = rb_predecessor(i)) {
-        int c1 = i->stepsToTheGoal != start->stepsToTheGoal;                 // non è un nodo con gli stessi passi di start
-        int c2 = maxRaggiung[i->stepsToTheGoal + 1] <= i->key;               // è un nodo raggiungibile da un nodo con un passo in più
-        int c3 = maxRaggiung[i->stepsToTheGoal] != -1;                       // almeno una volta è stato initializzato
-        int c4 = maxRaggiung[i->stepsToTheGoal] > i->key - i->parking->max;  // è un nodo che può andare più lontano di quello che ho già trovato con lo stesso numero di passi
+        int c1 = i->stepsToTheGoal != start->stepsToTheGoal;                     // non è un nodo con gli stessi passi di start
+        int c2 = maxRaggiung[i->stepsToTheGoal + 1].max <= i->key;               // è un nodo raggiungibile da un nodo con un passo in più
+        int c3 = maxRaggiung[i->stepsToTheGoal].max != -1;                       // almeno una volta è stato initializzato
+        int c4 = maxRaggiung[i->stepsToTheGoal].max > i->key - i->parking->max;  // è un nodo che può andare più lontano di quello che ho già trovato con lo stesso numero di passi
         if (c1 && (!c3 || (c2 && c4))) {
-            maxRaggiung[i->stepsToTheGoal] = i->key - i->parking->max;
+            maxRaggiung[i->stepsToTheGoal].max = i->key - i->parking->max;
+            maxRaggiung[i->stepsToTheGoal].key = i->key;
         }
     }
 
 #ifdef PRINTSTEPS
     for (int i = 0; i < start->stepsToTheGoal + 1; i++) {
-        printf("Max %d -> %d\n", i, maxRaggiung[i]);
+        printf("Max %d (by %d) -> %d, actual %d\n", i, maxRaggiung[i].key, maxRaggiung[i].max, rb_search_or_next(&stations, maxRaggiung[i].max, i - 1)->key);
     }
     // return NULL;
 #endif
@@ -979,7 +982,7 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
 
     l_list_insert(&res, start->key);
     for (int i = start->stepsToTheGoal; i > 1; i--) {
-        l_list_insert(&res, rb_search_or_next(&stations, maxRaggiung[i], i - 1)->key);
+        l_list_insert(&res, rb_search_or_next(&stations, maxRaggiung[i].max, i - 1)->key);
     }
 
     // L_List res = match_path(start, finish, path);
