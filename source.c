@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 // #define DEBUG
-// #define PRINTSTEPS
+#define PRINTSTEPS
 // #define PRINTLINE
 
 // =======================================================
@@ -42,8 +42,10 @@ typedef struct RBNode {
     struct RBNode *left, *right, *parent;
     rb_color color;
     int key;
-    int stepsToTheGoal;
     Parking *parking;
+
+    int stepsToTheGoal;
+    struct RBNode *nextStep;
 } rb_node;
 
 typedef struct {
@@ -57,6 +59,11 @@ typedef struct LList {
 
 typedef l_list *L_List;
 
+typedef struct {
+    int key;
+    int max;
+} Pair;
+
 // =======================================================
 // Global variables
 // =======================================================
@@ -66,7 +73,9 @@ little_rb_node *little_Tnil;
 rb_tree stations;
 int eligibleNumberOfStages;
 l_list *eligible;
-int line = 0;  // Line of the input
+int line = 0;      // Line of the input
+int *maxRaggiung;  // Per ogni step, il massimo raggiungibile
+int maxRaggiungLength;
 
 // =======================================================
 // Red Bkack Tree functions
@@ -365,6 +374,25 @@ void rb_delete(rb_tree *t, rb_node *z) {
     z->parking = NULL;
     z = NULL;
     return;
+}
+
+rb_node *rb_search_or_next(rb_tree *t, int key, int steps) {
+    rb_node *x = t->root;
+    rb_node *y = NULL;
+    while (x != Tnil) {
+        if (x->key - key == 0) {
+            return x;
+        }
+        if (x->key - key < 0) {
+            x = x->right;
+        } else {
+            y = x;
+            x = x->left;
+        }
+    }
+    while (y != Tnil && y->stepsToTheGoal != steps)
+        y = rb_successor(y);
+    return y;
 }
 
 // =======================================================
@@ -895,28 +923,66 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
     for (i = finish; i != Tnil && i->key <= start->key; i = rb_successor(i)) {
         if (i == finish) {
             i->stepsToTheGoal = 0;
+            maxRaggiung = malloc(sizeof(int));
+            maxRaggiung[0] = -1;
+            maxRaggiungLength = 0;
             continue;
         }
         i->stepsToTheGoal = -1;
+        i->nextStep = NULL;
         for (j = i; j->key >= finish->key && j->key >= i->key - i->parking->max; j = rb_predecessor(j)) {
-            if (i != j && j->stepsToTheGoal != -1 && (i->stepsToTheGoal == -1 || j->stepsToTheGoal < i->stepsToTheGoal - 1)) {
+            if (i != j && j->stepsToTheGoal != -1 && (i->stepsToTheGoal == -1 || j->stepsToTheGoal <= i->stepsToTheGoal - 1)) {
                 i->stepsToTheGoal = j->stepsToTheGoal + 1;
             }
         }
 
 #ifdef PRINTSTEPS
-        printf("Node %d has %d steps, can reach %d\n", i->key, i->stepsToTheGoal, i->key - i->parking->max);
+        if (i->stepsToTheGoal != -1)
+            printf("%d: %d steps, max %d\n", i->key, i->stepsToTheGoal, i->key - i->parking->max);
+        else
+            // TODO: colud return null here
+            printf("Node %d has %d steps\n", i->key, i->stepsToTheGoal);
+
 #endif
     }
-#ifdef PRINTSTEPS
-    return NULL;
-#endif
+    // #ifdef PRINTSTEPS
+    // return NULL;
+    // #endif
 
     if (start->stepsToTheGoal == -1)
         // Nessun percorso
         return NULL;
 
-    L_List res = match_path(start, finish, path);
+    maxRaggiung = (int *)malloc(sizeof(int) * start->stepsToTheGoal + 1);
+    for (int i = 0; i < start->stepsToTheGoal + 1; i++) {
+        maxRaggiung[i] = -1;
+    }
+    maxRaggiung[start->stepsToTheGoal] = start->key - start->parking->max;
+    for (rb_node *i = start; i != finish; i = rb_predecessor(i)) {
+        int c1 = i->stepsToTheGoal != start->stepsToTheGoal;                 // non è un nodo con gli stessi passi di start
+        int c2 = maxRaggiung[i->stepsToTheGoal + 1] <= i->key;               // è un nodo raggiungibile da un nodo con un passo in più
+        int c3 = maxRaggiung[i->stepsToTheGoal] != -1;                       // almeno una volta è stato initializzato
+        int c4 = maxRaggiung[i->stepsToTheGoal] > i->key - i->parking->max;  // è un nodo che può andare più lontano di quello che ho già trovato con lo stesso numero di passi
+        if (c1 && (!c3 || (c2 && c4))) {
+            maxRaggiung[i->stepsToTheGoal] = i->key - i->parking->max;
+        }
+    }
+
+#ifdef PRINTSTEPS
+    for (int i = 0; i < start->stepsToTheGoal + 1; i++) {
+        printf("Max %d -> %d\n", i, maxRaggiung[i]);
+    }
+    // return NULL;
+#endif
+
+    L_List res = NULL;
+
+    l_list_insert(&res, start->key);
+    for (int i = start->stepsToTheGoal; i > 1; i--) {
+        l_list_insert(&res, rb_search_or_next(&stations, maxRaggiung[i], i - 1)->key);
+    }
+
+    // L_List res = match_path(start, finish, path);
     return res;
 }
 
@@ -1074,8 +1140,8 @@ int main(int argc, char const *argv[]) {
                         } else {
                             // printf("%d ", start);
                             print_rev_list(path);
-                            free_list(path);
                             printf("%d\n", finish);
+                            free_list(path);
                         }
                     }
                 } else {

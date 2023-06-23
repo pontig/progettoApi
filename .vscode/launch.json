@@ -9,12 +9,22 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
-            "environment": [{ "name": "config", "value": "Debug" }],
+            "environment": [
+                {
+                    "name": "config",
+                    "value": "Debug"
+                }
+            ],
             "internalConsoleOptions": "openOnSessionStart",
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "preLaunchTask": "cppbuild",
-            "args": ["<", "input.txt", ">", "output.txt"],
+            "args": [
+                "<",
+                "input.txt",
+                ">",
+                "output.txt"
+            ],
             // "setupCommands": [
             //      {
             //          "text": "rm -rf ${workspaceFolder}/output.txt"
@@ -27,6 +37,14 @@
             //         "text": "settings set target.output-path ${workspaceFolder}/output.txt"
             //     }
             // ]
-        }
+        },
+        // {
+        //     "name": "sh tests",
+        //     "type": "shell",
+        //     "request": "launch",
+        //     //"command": "sh",
+        //     "program": "${workspaceFolder}/run_tests.sh",
+        //     "preLaunchTask": "cppbuild",
+        // }
     ]
 }
