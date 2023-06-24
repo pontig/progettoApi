@@ -12,7 +12,7 @@ for i in {1..112}
 do
     inputFile="open_tests/open_$i.txt"
     expectedOutputFile="open_tests/open_$i.output.txt"
-    #echo "Testing $i..."
+    echo "Testing $i..."
     ./a.out < $inputFile > output.txt
     compare_files output.txt $expectedOutputFile $i
     rm output.txt

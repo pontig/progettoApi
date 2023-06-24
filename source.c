@@ -796,9 +796,10 @@ int remove_car(rb_node *station, int autonomy) {
         --(car->numberOfCars);
     } else {
         if (car->autonomy == station->parking->max) {
+            little_rb_delete(station->parking->cars, car);
             station->parking->max = little_rb_maximum(station->parking->cars->root)->autonomy;
-        }
-        little_rb_delete(station->parking->cars, car);
+        } else
+            little_rb_delete(station->parking->cars, car);
     }
 
     return 1;
