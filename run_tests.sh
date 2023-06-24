@@ -8,7 +8,7 @@ compare_files() {
     fi
 }
 
-for i in {1..111}
+for i in {1..112}
 do
     inputFile="open_tests/open_$i.txt"
     expectedOutputFile="open_tests/open_$i.output.txt"
