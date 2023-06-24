@@ -5,6 +5,7 @@
 // #define DEBUG
 // #define PRINTSTEPS
 // #define PRINTLINE
+// #define WHYTNIL
 
 // =======================================================
 // Type definitions
@@ -74,21 +75,48 @@ little_rb_node *little_Tnil;
 rb_tree stations;
 int eligibleNumberOfStages;
 l_list *eligible;
-int line = 0;       // Line of the input
-Pair *maxRaggiung;  // Per ogni step, il massimo raggiungibile
-int maxRaggiungLength;
+int line = 0;  // Line of the input
+
+// =======================================================
+// Free functions
+// =======================================================
+void free_list(L_List p) {
+    if (p == NULL) return;
+    L_List next = p->next;  // Store the reference to the next node
+    free(p);                // Free the current node
+    free_list(next);        // Recursively free the rest of the list
+}
+
+void free_parking(little_rb_node *n) {
+    if (n != little_Tnil) {
+        free_parking(n->left);
+        free_parking(n->right);
+        free(n);
+    }
+}
+
+void free_rb(rb_node *n) {
+    if (n != Tnil) {
+        free_rb(n->left);
+        free_rb(n->right);
+        if (n->parking != NULL) {
+            free_parking(n->parking->cars->root);
+            free(n->parking->cars);
+            free(n->parking);
+        }
+        free(n);
+    }
+}
+
+void free_all() {
+    free_rb(stations.root);
+    free(Tnil);
+    free(little_Tnil);
+}
 
 // =======================================================
 // Red Bkack Tree functions
 // =======================================================
-
-void free_parking(bs_tree p) {
-    if (p != NULL) {
-        free_parking(p->left);
-        free_parking(p->right);
-        free(p);
-    }
-}
 
 void inorder(rb_node *root) {
     if (root != Tnil) {
@@ -369,11 +397,10 @@ void rb_delete(rb_tree *t, rb_node *z) {
         rb_delete_fixup(t, x);
     }
 
-    // free_parking(z->parking->cars);
+    free_parking(z->parking->cars->root);
+    free(z->parking->cars);
     free(z->parking);
     free(z);
-    z->parking = NULL;
-    z = NULL;
     return;
 }
 
@@ -798,6 +825,7 @@ int remove_car(rb_node *station, int autonomy) {
         if (car->autonomy == station->parking->max) {
             little_rb_delete(station->parking->cars, car);
             if (station->parking->cars->root == little_Tnil) {
+                free(station->parking->cars->root);  // TODO: not so sure about this
                 station->parking->max = 0;
             } else
                 station->parking->max = little_rb_maximum(station->parking->cars->root)->autonomy;
@@ -878,13 +906,6 @@ void l_list_insert(L_List *l, int key) {
     *l = new;
 }
 
-void free_list(L_List p) {
-    if (p == NULL) return;
-    L_List next = p->next;  // Store the reference to the next node
-    free(p);                // Free the current node
-    free_list(next);        // Recursively free the rest of the list
-}
-
 l_list *compute_path(rb_node *start, rb_node *finish, L_List *path) {
     rb_node *curr;
     for (curr = start; curr != Tnil && curr != finish; curr = rb_successor(curr)) {
@@ -895,9 +916,10 @@ l_list *compute_path(rb_node *start, rb_node *finish, L_List *path) {
             return compute_path(start, curr, path);
         }
     }
-    if (curr == finish)
+    if (curr == finish) {
+        free_list(*path);
         return NULL;
-    else
+    } else
         return *path;
 }
 
@@ -929,15 +951,11 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
     for (i = finish; i != Tnil && i->key <= start->key; i = rb_successor(i)) {
         if (i == finish) {
             i->stepsToTheGoal = 0;
-            maxRaggiung = malloc(sizeof(int));
-            maxRaggiung[0].max = -1;
-            maxRaggiung[0].key = finish->key;
-            maxRaggiungLength = 0;
             continue;
         }
         i->stepsToTheGoal = -1;
         i->nextStep = NULL;
-        for (j = i; j->key >= finish->key && j->key >= i->key - i->parking->max; j = rb_predecessor(j)) {
+        for (j = i; j != Tnil && j->key >= finish->key && j->key >= i->key - i->parking->max; j = rb_predecessor(j)) {
             if (i != j && j->stepsToTheGoal != -1 && (i->stepsToTheGoal == -1 || j->stepsToTheGoal <= i->stepsToTheGoal - 1)) {
                 i->stepsToTheGoal = j->stepsToTheGoal + 1;
             }
@@ -1012,6 +1030,8 @@ l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
             }
         }
     }
+
+    free(maxs);
 
     return res;
 }
@@ -1159,9 +1179,9 @@ int main(int argc, char const *argv[]) {
                         } else {
                             // printf("%d ", start);
                             print_list(path);
-                            free_list(path);
                             printf("%d\n", finish);
                         }
+                        free_list(path);
                     } else {
                         path = rev_compute_path(startNode, finishNode, &path);
                         // path = NULL;
@@ -1186,5 +1206,8 @@ int main(int argc, char const *argv[]) {
                 break;
         }
     }
+
+    free_all();
+
     return 0;
 }
