@@ -797,7 +797,10 @@ int remove_car(rb_node *station, int autonomy) {
     } else {
         if (car->autonomy == station->parking->max) {
             little_rb_delete(station->parking->cars, car);
-            station->parking->max = little_rb_maximum(station->parking->cars->root)->autonomy;
+            if (station->parking->cars->root == little_Tnil) {
+                station->parking->max = 0;
+            } else
+                station->parking->max = little_rb_maximum(station->parking->cars->root)->autonomy;
         } else
             little_rb_delete(station->parking->cars, car);
     }
@@ -922,6 +925,7 @@ l_list *match_path(rb_node *start, rb_node *current, L_List *path) {
 l_list *rev_compute_path(rb_node *start, rb_node *finish, L_List *path) {
     // 1: per ogni stazione dalla fine all'inizio segno quanti passi devo fare
     rb_node *i, *j;
+    if (start->parking == NULL || start->parking->max == 0) return NULL;
     for (i = finish; i != Tnil && i->key <= start->key; i = rb_successor(i)) {
         if (i == finish) {
             i->stepsToTheGoal = 0;
