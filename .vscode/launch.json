@@ -25,26 +25,8 @@
                 ">",
                 "output.txt"
             ],
-            // "setupCommands": [
-            //      {
-            //          "text": "rm -rf ${workspaceFolder}/output.txt"
-            //      },
-            //     {
-            //         // not sure what this exactly does but seems to work
-            //         "text": "settings set target.input-path ${workspaceFolder}/input.txt"
-            //     },
-            //     {
-            //         "text": "settings set target.output-path ${workspaceFolder}/output.txt"
-            //     }
-            // ]
+            
         },
-        // {
-        //     "name": "sh tests",
-        //     "type": "shell",
-        //     "request": "launch",
-        //     //"command": "sh",
-        //     "program": "${workspaceFolder}/run_tests.sh",
-        //     "preLaunchTask": "cppbuild",
-        // }
+        
     ]
 }

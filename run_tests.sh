@@ -8,6 +8,12 @@ compare_files() {
     fi
 }
 
+/usr/bin/gcc -Wall -Werror -g3 -fdiagnostics-color=always -g source.c -o a.out
+if [ $? -ne 0 ]; then
+    echo "Errore di compilazione"
+    exit 1
+fi
+
 for i in {1..112}
 do
     inputFile="open_tests/open_$i.txt"
